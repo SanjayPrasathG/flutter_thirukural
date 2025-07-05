@@ -26,6 +26,7 @@ class MyApp extends StatelessWidget {
         child: GetMaterialApp(
           title: 'Flutter Thirukural',
           home: KuralHomeScreen(),
+          debugShowCheckedModeBanner: false,
         ),
       ),
     );

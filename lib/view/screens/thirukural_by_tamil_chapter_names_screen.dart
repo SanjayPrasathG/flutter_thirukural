@@ -44,7 +44,10 @@ class ThirukuralByTamilChapterName extends HookConsumerWidget{
     }, []);
 
     Widget showAllChapterNames(){
-      if(kuralState.isAllTamilChaptersLoaded && kuralState.tamilChapterNamesErrorMessage.isEmpty){
+      if(kuralState.isAllTamilChaptersLoaded != null
+          && kuralState.isAllTamilChaptersLoaded!
+          && kuralState.tamilChapterNamesErrorMessage != null
+          && kuralState.tamilChapterNamesErrorMessage!.isEmpty){
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 10.0,
@@ -61,9 +64,9 @@ class ThirukuralByTamilChapterName extends HookConsumerWidget{
             ListView.builder(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
-              itemCount: kuralState.tamilChapterNamesList.length,
+              itemCount: kuralState.tamilChapterNamesList?.length,
               itemBuilder: (context, index){
-                String chapterName = kuralState.tamilChapterNamesList[index];
+                String chapterName = kuralState.tamilChapterNamesList?[index] ?? '';
                   return GestureDetector(
                     onTap: () async{
                       doShowChapterNamesOnly.value = false;
@@ -378,9 +381,11 @@ class ThirukuralByTamilChapterName extends HookConsumerWidget{
       );
     }
 
-
     Widget showKuralsInSelectedChapter(){
-      if(kuralState.tamilChapterNameKuralsList.isNotEmpty && kuralState.tamilChapterNameKuralsErrorMessage.isEmpty){
+      if(kuralState.tamilChapterNameKuralsList != null &&
+        kuralState.tamilChapterNameKuralsList!.isNotEmpty
+          && kuralState.tamilChapterNameKuralsErrorMessage != null
+          && kuralState.tamilChapterNameKuralsErrorMessage!.isEmpty){
         return Column(
           spacing: 10.0,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -419,15 +424,18 @@ class ThirukuralByTamilChapterName extends HookConsumerWidget{
             ListView.builder(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
-                itemCount: kuralState.tamilChapterNameKuralsList.length,
+                itemCount: kuralState.tamilChapterNameKuralsList?.length,
                 itemBuilder: (context, index){
-                  Kural kural = kuralState.tamilChapterNameKuralsList[index];
-                  return showKuralWithShowMore(
-                      kural: kural,
-                      imgHeight: height * 0.15,
-                      imgWidth: width * 0.35,
-                      index: index
-                  );
+                  Kural? kural = kuralState.tamilChapterNameKuralsList?[index];
+                  if(kural != null) {
+                    return showKuralWithShowMore(
+                        kural: kural,
+                        imgHeight: height * 0.15,
+                        imgWidth: width * 0.35,
+                        index: index
+                    );
+                  }
+                  return SizedBox();
                 }
             ),
           ],
@@ -435,7 +443,7 @@ class ThirukuralByTamilChapterName extends HookConsumerWidget{
       }
       else{
         return customText(
-            text: kuralState.tamilChapterNameKuralsErrorMessage,
+            text: kuralState.tamilChapterNameKuralsErrorMessage ?? 'Something went wrong.',
             textColor: CommonColors.red,
             fontSize: 14.0,
             fontWeight: FontWeight.bold,

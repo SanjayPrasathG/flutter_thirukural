@@ -57,6 +57,11 @@ class KuralViewModel extends StateNotifier<KuralState>{
 
 
   Future getKuralOfTheDay({required String? date}) async{
+
+    isKuralOfDayLoaded = false;
+    kuralOfDay = null;
+    errorMessageForKuralOfDay = '';
+
     String validDateMessage = isDateValid(date: date);
     logger.i(validDateMessage);
     if(validDateMessage.isEmpty) {
@@ -75,6 +80,7 @@ class KuralViewModel extends StateNotifier<KuralState>{
           Map<String, dynamic> responseJson = response.response;
           if(responseJson.isNotEmpty) {
             kuralOfDay = Kural.fromJson(response.response);
+            isKuralOfDayLoaded = true;
           } else{
             errorMessageForKuralOfDay = response.message ?? 'No response from server.';
           }
@@ -100,6 +106,10 @@ class KuralViewModel extends StateNotifier<KuralState>{
   }
 
   Future getKuralByKuralNumber({required int? kuralNumber}) async{
+    kuralByNumber = null;
+    errorMessageForKuralByNum = '';
+    isKuralByNumLoaded = false;
+
     if(kuralNumber != null && kuralNumber != 0) {
       try {
         ApiResponse response = await ApiServices.get(

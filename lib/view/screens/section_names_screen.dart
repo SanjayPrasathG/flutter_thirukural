@@ -57,7 +57,7 @@ class SectionNamesScreen extends HookConsumerWidget {
                 selectedEnglishSectionName.value = '';
                 selectedTamilSectionName.value = sectionName;
                 isPageLoaded.value = false;
-                await kuralViewModel.getKuralsByTamilSectionNames(sectionName: selectedTamilSectionName.value ?? '');
+                await kuralViewModel.getKuralsByTamilSectionNames(sectionName: selectedTamilSectionName.value);
                 isPageLoaded.value = true;
               },
               child: Container(
@@ -89,7 +89,7 @@ class SectionNamesScreen extends HookConsumerWidget {
                               selectedEnglishSectionName.value = '';
                               selectedTamilSectionName.value = sectionName;
                               isPageLoaded.value = false;
-                              await kuralViewModel.getKuralsByTamilSectionNames(sectionName: selectedTamilSectionName.value ?? '');
+                              await kuralViewModel.getKuralsByTamilSectionNames(sectionName: selectedTamilSectionName.value);
                               isPageLoaded.value = true;
                             },
                             icon: Icon(Icons.arrow_forward_ios_outlined, color: CommonColors.grey, size: 15.0,)
@@ -116,7 +116,7 @@ class SectionNamesScreen extends HookConsumerWidget {
                 selectedEnglishSectionName.value = sectionName;
                 selectedTamilSectionName.value = '';
                 isPageLoaded.value = false;
-                await kuralViewModel.getKuralsByEnglishSectionNames(sectionName: selectedEnglishSectionName.value ?? '');
+                await kuralViewModel.getKuralsByEnglishSectionNames(sectionName: selectedEnglishSectionName.value);
                 isPageLoaded.value = true;
               },
               child: Container(
@@ -148,7 +148,7 @@ class SectionNamesScreen extends HookConsumerWidget {
                               selectedEnglishSectionName.value = sectionName;
                               selectedTamilSectionName.value = '';
                               isPageLoaded.value = false;
-                              await kuralViewModel.getKuralsByEnglishSectionNames(sectionName: selectedEnglishSectionName.value ?? '');
+                              await kuralViewModel.getKuralsByEnglishSectionNames(sectionName: selectedEnglishSectionName.value);
                               isPageLoaded.value = true;
                             },
                             icon: Icon(Icons.arrow_forward_ios_outlined,
@@ -451,13 +451,13 @@ class SectionNamesScreen extends HookConsumerWidget {
       bool isLoaded = false;
 
       if(selectedTamilSectionName.value.isNotEmpty){
-        isLoaded = kuralState.isAllTamilSectionKuralsLoaded;
-        kuralsList = kuralState.tamilSectionNameKuralsList;
-        errorMessage = kuralState.tamilSectionNameKuralsErrorMessage;
+        isLoaded = kuralState.isAllTamilSectionKuralsLoaded ?? false;
+        kuralsList = kuralState.tamilSectionNameKuralsList ?? [];
+        errorMessage = kuralState.tamilSectionNameKuralsErrorMessage ?? 'Error while loading kurals.';
       } else if(selectedEnglishSectionName.value.isNotEmpty){
-        isLoaded = kuralState.isAllEnglishSectionKuralsLoaded;
-        kuralsList = kuralState.englishSectionNameKuralsList;
-        errorMessage = kuralState.englishSectionNameKuralsErrorMessage;
+        isLoaded = kuralState.isAllEnglishSectionKuralsLoaded ?? false;
+        kuralsList = kuralState.englishSectionNameKuralsList ?? [];
+        errorMessage = kuralState.englishSectionNameKuralsErrorMessage ?? 'Error while loading kurals.';
       }
 
       if(isLoaded && kuralsList.isNotEmpty && errorMessage.isEmpty){

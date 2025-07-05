@@ -10,8 +10,11 @@ import '../../view_model/kural_view_model.dart';
 import '../widgets/common_colors.dart';
 import '../widgets/custom_app_bar.dart';
 
-class AllKuralsScreen extends HookConsumerWidget {
-  const AllKuralsScreen({super.key});
+class AllKuralsScreenInRange extends HookConsumerWidget {
+  final int? from;
+  final int? to;
+
+  const AllKuralsScreenInRange({super.key, required this.from, required this.to});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -27,7 +30,7 @@ class AllKuralsScreen extends HookConsumerWidget {
     Future onPageLoad() async {
       isPageLoaded.value = false;
       logger.w('page loading');
-      await kuralViewModel.getAllKurals();
+      await kuralViewModel.getAllKuralsInRange(from: from ?? 0, to: to ?? 0);
       logger.w('page loaded');
       isPageLoaded.value = true;
     }
@@ -37,7 +40,8 @@ class AllKuralsScreen extends HookConsumerWidget {
         onPageLoad();
       });
       return null;
-    }, [kuralState.allKuralsList]);
+    }, [kuralState.kuralsInRangeList]);
+
 
     Widget showKuralWithShowMore({
       required int index,
@@ -290,62 +294,62 @@ class AllKuralsScreen extends HookConsumerWidget {
 
     return isPageLoaded.value
         ? RefreshIndicator(
-      onRefresh: onPageLoad,
-      color: CommonColors.white,
-      backgroundColor: CommonColors.primary,
-      child: Scaffold(
-        appBar: CustomHomeAppBar(
-          title: 'All Thirukurals',
-          titleColor: CommonColors.white,
-          showLeading: true,
-        ),
-        backgroundColor: CommonColors.white,
-        body: Center(
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
-            height: height.value,
-            width: ResponsiveValue<double>(
-                context,
-                defaultValue: width.value * 0.5,
-                conditionalValues: [
-                  const Condition.smallerThan(name: TABLET, value: double.infinity),
-                ]
-            ).value,
-            child: ListView(
-              children: [
-                Visibility(
-                  visible: (kuralState.errorMessageForAllKurals == null || kuralState.errorMessageForAllKurals!.isEmpty)
-                      && (kuralState.allKuralsList != null && kuralState.allKuralsList!.isNotEmpty),
-                  child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: kuralState.allKuralsList?.length,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index){
-                        Kural? kural = kuralState.allKuralsList?[index];
-                        if(kural != null){
-                          return showKuralWithShowMore(
-                              kural: kural,
-                              imgHeight: height.value * 0.15,
-                              imgWidth: width.value * 0.5,
-                              index: index
-                          );
-                        }
-                        return SizedBox();
-                      }
+            onRefresh: onPageLoad,
+            color: CommonColors.white,
+            backgroundColor: CommonColors.primary,
+            child: Scaffold(
+              appBar: CustomHomeAppBar(
+                title: 'Thirukurals in Range $from - $to',
+                titleColor: CommonColors.white,
+                showLeading: true,
+              ),
+              backgroundColor: CommonColors.white,
+              body: Center(
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
+                  height: height.value,
+                  width: ResponsiveValue<double>(
+                      context,
+                      defaultValue: width.value * 0.5,
+                      conditionalValues: [
+                        const Condition.smallerThan(name: TABLET, value: double.infinity),
+                      ]
+                  ).value,
+                  child: ListView(
+                    children: [
+                      Visibility(
+                        visible: (kuralState.errorMessageForAllKuralsInRange == null || kuralState.errorMessageForAllKuralsInRange!.isEmpty)
+                            && (kuralState.kuralsInRangeList != null && kuralState.kuralsInRangeList!.isNotEmpty),
+                        child: ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: kuralState.kuralsInRangeList?.length,
+                            itemBuilder: (context, index){
+                              Kural? kural = kuralState.kuralsInRangeList?[index];
+                              if(kural != null){
+                                return showKuralWithShowMore(
+                                    kural: kural,
+                                    imgHeight: height.value * 0.15,
+                                    imgWidth: width.value * 0.5,
+                                  index: index
+                                );
+                              }
+                              return SizedBox();
+                            }
+                        ),
+                      ),
+                      Visibility(
+                        visible: (kuralState.errorMessageForAllKuralsInRange != null && kuralState.errorMessageForAllKuralsInRange!.isNotEmpty)
+                            || kuralState.kuralsInRangeList == null || kuralState.kuralsInRangeList!.isEmpty,
+                          child: showErrorWidget(errorMessage: kuralState.errorMessageForAllKuralsInRange ?? 'Some thing went wrong while fetching all kurals.')
+                      ),
+                      SizedBox(height: 10.0,),
+                    ],
                   ),
                 ),
-                Visibility(
-                    visible: (kuralState.errorMessageForAllKurals != null && kuralState.errorMessageForAllKurals!.isNotEmpty)
-                        || kuralState.allKuralsList == null || kuralState.allKuralsList!.isEmpty,
-                    child: showErrorWidget(errorMessage: kuralState.errorMessageForAllKurals ?? 'Some thing went wrong while fetching all kurals.')
-                ),
-                SizedBox(height: 10.0,),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
-    )
+          )
         : showLoader();
   }
 }

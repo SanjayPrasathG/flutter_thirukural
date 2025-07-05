@@ -64,10 +64,15 @@ class GetKuralByNumber extends HookConsumerWidget{
               shrinkWrap: true,
               children: [
                 kuralState.errorMessageForKuralByNum != null && kuralState.errorMessageForKuralByNum!.isEmpty ?
-                kuralState.kuralByNumber != null ?
-                showKural(kural: kuralState.kuralByNumber!, imgHeight: height.value * 0.2, imgWidth: width.value * 0.5) :
-                showErrorWidget(errorMessage: kuralState.errorMessageForKuralByNum ?? 'Something went wrong, please try again later')
-                    :
+                  kuralState.kuralByNumber != null ?
+                    showKural(kural: kuralState.kuralByNumber!,
+                        imgHeight: height.value * 0.2,
+                        imgWidth: width.value * 0.5,
+                        isMobile: ResponsiveBreakpoints.of(context).isMobile
+                    )
+                      :
+                    showErrorWidget(errorMessage: kuralState.errorMessageForKuralByNum ?? 'Something went wrong, please try again later')
+                  :
                 showErrorWidget(errorMessage: kuralState.errorMessageForKuralByNum ?? 'Something went wrong, please try again later')
               ],
             ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_thirukural/helpers/common_helpers.dart';
-import 'package:flutter_thirukural/view/screens/all_kurals_in_range__screen.dart';
+import 'package:flutter_thirukural/view/screens/all_kurals_in_range_screen.dart';
 import 'package:flutter_thirukural/view/screens/get_kural_by_number.dart';
 import 'package:flutter_thirukural/view/screens/get_kural_of_day_screen.dart';
 import 'package:flutter_thirukural/view/screens/section_names_screen.dart';
@@ -10,11 +10,10 @@ import 'package:flutter_thirukural/view/screens/thirukural_by_tamil_chapter_name
 import 'package:flutter_thirukural/view/widgets/common_colors.dart';
 import 'package:flutter_thirukural/view/widgets/common_widgets.dart';
 import 'package:flutter_thirukural/view/widgets/custom_app_bar.dart';
+import 'package:get/get.dart' as GET;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:responsive_framework/responsive_framework.dart';
-import 'package:get/get.dart' as GET;
 
-import '../widgets/custom_loader_button.dart';
 import 'all_kurals_screen.dart';
 
 class KuralHomeScreen extends HookConsumerWidget{
@@ -27,8 +26,7 @@ class KuralHomeScreen extends HookConsumerWidget{
     var selectedTile = useState('');
     var height = getDeviceHeight(context);
     var width = getDeviceWidth(context);
-    var deviceName = getDeviceInfo(context);
-    
+
     Future onPageLoaded() async{
       isPageLoaded.value = false;
       isPageLoaded.value = true;
@@ -133,5 +131,4 @@ class KuralHomeScreen extends HookConsumerWidget{
       ),
     );
   }
-
 }

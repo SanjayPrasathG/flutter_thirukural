@@ -20,8 +20,8 @@ class GetThirukuralOfDayScreen extends HookConsumerWidget{
     final kuralViewModel = ref.read(kuralViewModelProvider.notifier);
     final kuralState = ref.watch(kuralViewModelProvider);
 
-    var height = useState(getDeviceHeight(context));
-    var width = useState(getDeviceWidth(context));
+    var height = getDeviceHeight(context);
+    var width = getDeviceWidth(context);
     var isPageLoaded = useState(false);
 
     Future onPageLoad() async{
@@ -53,20 +53,26 @@ class GetThirukuralOfDayScreen extends HookConsumerWidget{
         body: Center(
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
-            height: height.value,
+            height: height,
             width: ResponsiveValue<double>(
               context,
-              defaultValue: width.value * 0.5,
+              defaultValue: width * 0.8,
               conditionalValues: [
-                const Condition.smallerThan(name: TABLET, value: double.infinity),
-              ]
+                const Condition.smallerThan(
+                    name: TABLET, value: double.infinity),
+              ],
             ).value,
             child: ListView(
               shrinkWrap: true,
               children: [
                 kuralState.errorMessageForKuralOfDay != null && kuralState.errorMessageForKuralOfDay!.isEmpty ?
                   kuralState.kuralOfTheDay != null ?
-                    showKural(kural: kuralState.kuralOfTheDay!, imgHeight: height.value * 0.2, imgWidth: width.value * 0.5) :
+                    showKural(
+                        kural: kuralState.kuralOfTheDay!,
+                        imgHeight: height * 0.18,
+                        imgWidth: width * 0.45,
+                      isMobile: ResponsiveBreakpoints.of(context).isMobile
+                    ) :
                     showErrorWidget(errorMessage: kuralState.errorMessageForKuralOfDay ?? 'Something went wrong, please try again later')
                   :
                 showErrorWidget(errorMessage: kuralState.errorMessageForKuralOfDay ?? 'Something went wrong, please try again later')

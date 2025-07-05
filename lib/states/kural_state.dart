@@ -9,37 +9,37 @@ class KuralState{
   String? errorMessageForAllKuralsInRange = '';
   bool? isAllKuralsInRangeLoaded;
 
-  List<Kural> allKuralsList = [];
-  String errorMessageForAllKurals = '';
-  bool isAllKuralsLoaded = false;
+  List<Kural>? allKuralsList = [];
+  String? errorMessageForAllKurals = '';
+  bool? isAllKuralsLoaded = false;
 
   Kural? kuralByNumber;
   String? errorMessageForKuralByNum = '';
-  bool isKuralByNumLoaded = false;
+  bool? isKuralByNumLoaded = false;
 
-  List<String> tamilChapterNamesList = [];
-  bool isAllTamilChaptersLoaded = false;
-  String tamilChapterNamesErrorMessage = '';
+  List<String>? tamilChapterNamesList = [];
+  bool? isAllTamilChaptersLoaded = false;
+  String? tamilChapterNamesErrorMessage = '';
 
-  List<String> englishChapterNamesList = [];
-  bool isAllEnglishChaptersLoaded = false;
-  String englishChapterNamesErrorMessage = '';
+  List<String>? englishChapterNamesList = [];
+  bool? isAllEnglishChaptersLoaded = false;
+  String? englishChapterNamesErrorMessage = '';
 
-  List<Kural> tamilChapterNameKuralsList = [];
-  bool isAllTamilChaptersKuralsLoaded = false;
-  String tamilChapterNameKuralsErrorMessage = '';
+  List<Kural>? tamilChapterNameKuralsList = [];
+  bool? isAllTamilChaptersKuralsLoaded = false;
+  String? tamilChapterNameKuralsErrorMessage = '';
 
-  List<Kural> englishChapterNameKuralsList = [];
-  bool isAllEnglishChaptersKuralsLoaded = false;
-  String englishChapterNameKuralsErrorMessage = '';
+  List<Kural>? englishChapterNameKuralsList = [];
+  bool? isAllEnglishChaptersKuralsLoaded = false;
+  String? englishChapterNameKuralsErrorMessage = '';
 
-  List<Kural> tamilSectionNameKuralsList = [];
-  bool isAllTamilSectionKuralsLoaded = false;
-  String tamilSectionNameKuralsErrorMessage = '';
+  List<Kural>? tamilSectionNameKuralsList = [];
+  bool? isAllTamilSectionKuralsLoaded = false;
+  String? tamilSectionNameKuralsErrorMessage = '';
 
-  List<Kural> englishSectionNameKuralsList = [];
-  bool isAllEnglishSectionKuralsLoaded = false;
-  String englishSectionNameKuralsErrorMessage = '';
+  List<Kural>? englishSectionNameKuralsList = [];
+  bool? isAllEnglishSectionKuralsLoaded = false;
+  String? englishSectionNameKuralsErrorMessage = '';
 
   KuralState();
 
@@ -111,14 +111,14 @@ class KuralState{
    return KuralState.kuralOfDay(
        kuralOfTheDay: kuralOfTheDay ?? this.kuralOfTheDay,
        errorMessageForKuralOfDay: errorMessageForKuralOfDay ?? this.errorMessageForKuralOfDay,
-       isKuralOfDayLoaded: isKuralOfDayLoaded ?? this.isKuralOfDayLoaded
+       isKuralOfDayLoaded: isKuralOfDayLoaded
    );
   }
 
   KuralState allKuralsCopyWith({
-    required List<Kural> allKuralsList,
-    required bool isAllKuralsLoaded,
-    required String errorMessageForAllKurals
+    required List<Kural>? allKuralsList,
+    required bool? isAllKuralsLoaded,
+    required String? errorMessageForAllKurals
   }){
     return KuralState.allKurals(
         allKuralsList: allKuralsList ?? this.allKuralsList,
@@ -128,21 +128,21 @@ class KuralState{
   }
 
   KuralState allKuralsInRangeCopyWith({
-    required List<Kural> kuralsInRangeList,
-    required bool isAllKuralsInRangeLoaded,
-    required String errorMessageForAllKuralsInRange
+    required List<Kural>? kuralsInRangeList,
+    required bool? isAllKuralsInRangeLoaded,
+    required String? errorMessageForAllKuralsInRange
   }){
     return KuralState.allKuralsInRange(
         kuralsInRangeList: kuralsInRangeList ?? this.kuralsInRangeList,
         isAllKuralsInRangeLoaded: isAllKuralsInRangeLoaded ?? this.isAllKuralsInRangeLoaded,
-        errorMessageForAllKuralsInRange: errorMessageForAllKurals ?? this.errorMessageForAllKuralsInRange
+        errorMessageForAllKuralsInRange: errorMessageForAllKuralsInRange ?? this.errorMessageForAllKuralsInRange
     );
   }
 
   KuralState kuralByNumCopyWith({
     required Kural? kuralByNum,
     required String? errorMessageForKuralByNum,
-    required bool isKuralByNumLoaded
+    required bool? isKuralByNumLoaded
   }){
     return KuralState.kuralByNumber(
         kuralByNumber: kuralByNum ?? kuralByNumber,

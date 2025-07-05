@@ -44,7 +44,10 @@ class ThirukuralByEnglishChapterName extends HookConsumerWidget{
     }, []);
 
     Widget showAllChapterNames(){
-      if(kuralState.isAllEnglishChaptersLoaded && kuralState.englishChapterNamesErrorMessage.isEmpty){
+      if(kuralState.isAllEnglishChaptersLoaded != null
+          && kuralState.isAllEnglishChaptersLoaded!
+          && kuralState.englishChapterNamesErrorMessage != null
+          && kuralState.englishChapterNamesErrorMessage!.isEmpty){
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 10.0,
@@ -61,9 +64,9 @@ class ThirukuralByEnglishChapterName extends HookConsumerWidget{
             ListView.builder(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
-              itemCount: kuralState.englishChapterNamesList.length,
+              itemCount: kuralState.englishChapterNamesList?.length,
               itemBuilder: (context, index){
-                String chapterName = kuralState.englishChapterNamesList[index];
+                String chapterName = kuralState.englishChapterNamesList?[index] ?? '';
                   return GestureDetector(
                     onTap: () async{
                       doShowChapterNamesOnly.value = false;
@@ -380,7 +383,10 @@ class ThirukuralByEnglishChapterName extends HookConsumerWidget{
 
 
     Widget showKuralsInSelectedChapter(){
-      if(kuralState.englishChapterNameKuralsList.isNotEmpty && kuralState.englishChapterNameKuralsErrorMessage.isEmpty){
+      if(kuralState.englishChapterNameKuralsList != null &&
+          kuralState.englishChapterNameKuralsList!.isNotEmpty
+          && kuralState.englishChapterNameKuralsErrorMessage != null
+          && kuralState.englishChapterNameKuralsErrorMessage!.isEmpty){
         return Column(
           spacing: 10.0,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -419,15 +425,18 @@ class ThirukuralByEnglishChapterName extends HookConsumerWidget{
             ListView.builder(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
-                itemCount: kuralState.englishChapterNameKuralsList.length,
+                itemCount: kuralState.englishChapterNameKuralsList?.length,
                 itemBuilder: (context, index){
-                  Kural kural = kuralState.englishChapterNameKuralsList[index];
-                  return showKuralWithShowMore(
-                      kural: kural,
-                      imgHeight: height * 0.15,
-                      imgWidth: width * 0.35,
-                      index: index
-                  );
+                  Kural? kural = kuralState.englishChapterNameKuralsList?[index];
+                  if(kural != null) {
+                    return showKuralWithShowMore(
+                        kural: kural,
+                        imgHeight: height * 0.15,
+                        imgWidth: width * 0.35,
+                        index: index
+                    );
+                  }
+                  return SizedBox();
                 }
             ),
           ],
@@ -435,7 +444,7 @@ class ThirukuralByEnglishChapterName extends HookConsumerWidget{
       }
       else{
         return customText(
-            text: kuralState.englishChapterNameKuralsErrorMessage,
+            text: kuralState.englishChapterNameKuralsErrorMessage ?? 'Something went wrong.',
             textColor: CommonColors.red,
             fontSize: 14.0,
             fontWeight: FontWeight.bold,

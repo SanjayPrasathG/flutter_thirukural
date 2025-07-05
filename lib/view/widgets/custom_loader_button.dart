@@ -3,7 +3,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_thirukural/view/widgets/common_colors.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:responsive_framework/responsive_framework.dart';
 
 import 'common_widgets.dart';
 
@@ -48,7 +47,7 @@ class CustomLoaderButton extends HookConsumerWidget{
             child: IconButton(
               style: ButtonStyle(
                 iconSize: WidgetStateProperty.all(width ?? 25.0),
-                shape: MaterialStateProperty.all(
+                shape: WidgetStateProperty.all(
                   const CircleBorder(),
                 ),
                 backgroundColor: WidgetStateProperty.all(buttonColor)

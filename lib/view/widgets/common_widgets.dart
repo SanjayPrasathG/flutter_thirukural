@@ -30,9 +30,71 @@ Widget customText({
   );
 }
 
-Widget showKural({required Kural kural, required double imgHeight, required double imgWidth}){
+Widget showKural({required Kural kural, required double imgHeight, required double imgWidth, required bool isMobile}){
+  final fullText = kural.kural ?? '';
+  final words = fullText.split(' ');
+
+  final firstLineWords = words.length >= 4
+      ? words.sublist(0, 4)
+      : words;
+
+  final secondLineWords = words.length > 4
+      ? words.sublist(4, words.length > 7 ? 7 : words.length)
+      : [];
+
+  final firstLine = firstLineWords.join(' ');
+  final secondLine = secondLineWords.join(' ');
+
+  final displayText = [
+    firstLine,
+    if (secondLine.isNotEmpty) secondLine,
+  ].join('\n');
+
+  Widget kuralContent = Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    mainAxisAlignment: MainAxisAlignment.end,
+    children: [
+      SizedBox(height: 20.0,),
+      customText(
+        text: displayText,
+        textColor: CommonColors.blue,
+        fontSize: isMobile ? 13.0 : 15.0,
+        fontWeight: FontWeight.bold,
+        textAlign: TextAlign.start,
+        textOverFlow: TextOverflow.clip,
+        maxLines: 3,
+      ),
+      SizedBox(height: 5.0),
+      Align(
+        alignment: Alignment.bottomRight,
+        child: customText(
+          text: "- திருவள்ளுவர்",
+          textColor: CommonColors.purple,
+          fontSize: 13.0,
+          fontWeight: FontWeight.bold,
+          textAlign: TextAlign.end,
+          textOverFlow: TextOverflow.clip,
+        ),
+      ),
+    ],
+  );
+
+  Widget imageWidget = Container(
+    width: imgWidth,
+    height: imgHeight,
+    decoration: BoxDecoration(
+      shape: BoxShape.circle,
+      border: Border.all(color: CommonColors.primary, width: 4),
+      image: DecorationImage(
+        image: AssetImage('assets/images/thiruvalluvar_img.png'),
+        fit: BoxFit.fitHeight,
+      ),
+    ),
+  );
+
+
   return Container(
-    margin: EdgeInsets.symmetric(horizontal: 3.0, vertical: 1.5),
+    margin: EdgeInsets.symmetric(horizontal: 6.0, vertical: 4),
     padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
     decoration: BoxDecoration(
       color: CommonColors.lightPrimary,
@@ -41,158 +103,141 @@ Widget showKural({required Kural kural, required double imgHeight, required doub
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          spacing: 10.0,
+        customText(
+          text: 'Kural Number : ${kural.kuralNumber ?? 'N/A'}',
+          textColor: CommonColors.purple,
+          fontSize: 15.0,
+          fontWeight: FontWeight.bold,
+          textAlign: TextAlign.start,
+          textOverFlow: TextOverflow.clip,
+        ),
+        SizedBox(height: 10.0),
+        isMobile
+            ? Column(
           children: [
-            Expanded(
-              flex: 1,
-              child: ClipOval(
-                child: SizedBox(
-                  width: imgWidth,
-                  height: imgHeight,
-                  child: Image.asset(
-                    'assets/images/thiruvalluvar_img.png',
-                    fit: BoxFit.cover,
-                    filterQuality: FilterQuality.high,
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 3,
-                child: customText(
-                    text: kural.kural ?? '',
-                    textColor: CommonColors.blue,
-                    fontSize: 15.0,
-                    fontWeight: FontWeight.bold,
-                    textAlign: TextAlign.start,
-                    textOverFlow: TextOverflow.clip,
-                  maxLines: 2
-                ),
-            ),
+            Center(child: imageWidget),
+            SizedBox(height: 10.0),
+            kuralContent,
+          ],
+        )
+            : Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(flex: 1,child: imageWidget),
+            SizedBox(width: 10.0),
+            Expanded(flex: 4,child: kuralContent),
           ],
         ),
-        SizedBox(height: 10.0,),
+        SizedBox(height: 10.0),
         customText(
-            text: 'Kural Number : ${kural.kuralNumber ?? 'N/A'}',
-            textColor: CommonColors.purple,
-            fontSize: 15.0,
-            fontWeight: FontWeight.bold,
-            textAlign: TextAlign.start,
-            textOverFlow: TextOverflow.clip
+          text: 'Tamil Explanation: ',
+          textColor: CommonColors.black,
+          fontSize: 15.0,
+          fontWeight: FontWeight.bold,
+          textAlign: TextAlign.start,
+          textOverFlow: TextOverflow.clip,
         ),
-        SizedBox(height: 10.0,),
+        SizedBox(height: 5.0),
         customText(
-            text: 'Tamil Explanation: ',
-            textColor: CommonColors.black,
-            fontSize: 15.0,
-            fontWeight: FontWeight.bold,
-            textAlign: TextAlign.start,
-            textOverFlow: TextOverflow.clip
+          text: kural.tamilExplanation ?? '',
+          textColor: CommonColors.green,
+          fontSize: 15.0,
+          fontWeight: FontWeight.bold,
+          textAlign: TextAlign.start,
+          textOverFlow: TextOverflow.clip,
+          maxLines: 5,
         ),
-        SizedBox(height: 5.0,),
+        SizedBox(height: 10.0),
         customText(
-            text: kural.tamilExplanation ?? '',
-            textColor: CommonColors.green,
-            fontSize: 15.0,
-            fontWeight: FontWeight.bold,
-            textAlign: TextAlign.start,
-            textOverFlow: TextOverflow.clip,
-            maxLines: 5
+          text: 'English Explanation: ',
+          textColor: CommonColors.black,
+          fontSize: 15.0,
+          fontWeight: FontWeight.bold,
+          textAlign: TextAlign.start,
+          textOverFlow: TextOverflow.clip,
         ),
-        SizedBox(height: 10.0,),
+        SizedBox(height: 5.0),
         customText(
-            text: 'English Explanation: ',
-            textColor: CommonColors.black,
-            fontSize: 15.0,
-            fontWeight: FontWeight.bold,
-            textAlign: TextAlign.start,
-            textOverFlow: TextOverflow.clip,
+          text: kural.englishExplanation ?? '',
+          textColor: CommonColors.green,
+          fontSize: 15.0,
+          fontWeight: FontWeight.bold,
+          textAlign: TextAlign.start,
+          textOverFlow: TextOverflow.clip,
+          maxLines: 5,
         ),
-        SizedBox(height: 5.0,),
+        SizedBox(height: 10.0),
         customText(
-            text: kural.englishExplanation ?? '',
-            textColor: CommonColors.green,
-            fontSize: 15.0,
-            fontWeight: FontWeight.bold,
-            textAlign: TextAlign.start,
-            textOverFlow: TextOverflow.clip,
-            maxLines: 5
+          text: 'Section Name',
+          textColor: CommonColors.black,
+          fontSize: 15.0,
+          fontWeight: FontWeight.bold,
+          textAlign: TextAlign.start,
+          textOverFlow: TextOverflow.clip,
         ),
-        SizedBox(height: 10.0,),
-        customText(
-            text: 'Section Name',
-            textColor: CommonColors.black,
-            fontSize: 15.0,
-            fontWeight: FontWeight.bold,
-            textAlign: TextAlign.start,
-            textOverFlow: TextOverflow.clip
-        ),
-        SizedBox(height: 5.0,),
+        SizedBox(height: 5.0),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          spacing: 5.0,
           children: [
             Expanded(
               child: customText(
-                  text: kural.tamilSectionName ?? '',
-                  textColor: CommonColors.gold,
-                  fontSize: 15.0,
-                  fontWeight: FontWeight.bold,
-                  textAlign: TextAlign.start,
-                  textOverFlow: TextOverflow.clip
+                text: kural.tamilSectionName ?? '',
+                textColor: CommonColors.gold,
+                fontSize: 15.0,
+                fontWeight: FontWeight.bold,
+                textAlign: TextAlign.start,
+                textOverFlow: TextOverflow.clip,
               ),
             ),
             Expanded(
               child: customText(
-                  text: kural.englishSectionName ?? '',
-                  textColor: CommonColors.gold,
-                  fontSize: 15.0,
-                  fontWeight: FontWeight.bold,
-                  textAlign: TextAlign.end,
-                  textOverFlow: TextOverflow.clip
+                text: kural.englishSectionName ?? '',
+                textColor: CommonColors.gold,
+                fontSize: 15.0,
+                fontWeight: FontWeight.bold,
+                textAlign: TextAlign.end,
+                textOverFlow: TextOverflow.clip,
               ),
             ),
           ],
         ),
-        SizedBox(height: 10.0,),
+        SizedBox(height: 10.0),
         customText(
-            text: 'Chapter Name',
-            textColor: CommonColors.black,
-            fontSize: 15.0,
-            fontWeight: FontWeight.bold,
-            textAlign: TextAlign.start,
-            textOverFlow: TextOverflow.clip
+          text: 'Chapter Name',
+          textColor: CommonColors.black,
+          fontSize: 15.0,
+          fontWeight: FontWeight.bold,
+          textAlign: TextAlign.start,
+          textOverFlow: TextOverflow.clip,
         ),
-        SizedBox(height: 5.0,),
+        SizedBox(height: 5.0),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          spacing: 5.0,
           children: [
             Expanded(
               child: customText(
-                  text: kural.tamilChapterName ?? '',
-                  textColor: CommonColors.orange,
-                  fontSize: 15.0,
-                  fontWeight: FontWeight.bold,
-                  textAlign: TextAlign.start,
-                  textOverFlow: TextOverflow.clip
+                text: kural.tamilChapterName ?? '',
+                textColor: CommonColors.orange,
+                fontSize: 15.0,
+                fontWeight: FontWeight.bold,
+                textAlign: TextAlign.start,
+                textOverFlow: TextOverflow.clip,
               ),
             ),
             Expanded(
               child: customText(
-                  text: kural.englishChapterName ?? '',
-                  textColor: CommonColors.orange,
-                  fontSize: 15.0,
-                  fontWeight: FontWeight.bold,
-                  textAlign: TextAlign.end,
-                  textOverFlow: TextOverflow.clip
+                text: kural.englishChapterName ?? '',
+                textColor: CommonColors.orange,
+                fontSize: 15.0,
+                fontWeight: FontWeight.bold,
+                textAlign: TextAlign.end,
+                textOverFlow: TextOverflow.clip,
               ),
             ),
           ],
         ),
-        SizedBox(height: 10.0,),
+        SizedBox(height: 10.0),
       ],
     ),
   );

@@ -10,37 +10,43 @@ import 'package:flutter_thirukural/view/screens/thirukural_by_tamil_chapter_name
 import 'package:flutter_thirukural/view/widgets/common_colors.dart';
 import 'package:flutter_thirukural/view/widgets/common_widgets.dart';
 import 'package:flutter_thirukural/view/widgets/custom_app_bar.dart';
-import 'package:get/get.dart' as GET;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 import 'all_kurals_screen.dart';
 
-class KuralHomeScreen extends HookConsumerWidget{
+class KuralHomeScreen extends HookConsumerWidget {
   const KuralHomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
-    var isPageLoaded=  useState(false);
+    var isPageLoaded = useState(false);
     var selectedTile = useState('');
     var height = getDeviceHeight(context);
     var width = getDeviceWidth(context);
 
-    Future onPageLoaded() async{
+    Future onPageLoaded() async {
       isPageLoaded.value = false;
       isPageLoaded.value = true;
     }
-    
-    useEffect((){
+
+    useEffect(() {
       onPageLoaded();
       return null;
     }, []);
-    
+
+    void navigateTo(Widget screen) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => screen),
+      );
+    }
+
     return Scaffold(
       appBar: CustomHomeAppBar(
-          title: 'Thirukurals', 
-          titleColor: CommonColors.white
+        title: 'Thirukurals',
+        titleColor: CommonColors.white,
       ),
       backgroundColor: CommonColors.white,
       body: Center(
@@ -50,78 +56,82 @@ class KuralHomeScreen extends HookConsumerWidget{
             context,
             defaultValue: width * 0.5,
             conditionalValues: [
-            const Condition.smallerThan(name: TABLET, value: double.infinity),
-          ],).value,
-          padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 3.0),
+              const Condition.smallerThan(name: TABLET, value: double.infinity),
+            ],
+          ).value,
+          padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 3.0),
           child: ListView(
             children: [
               customListTile(
-                  leadingIcon: Icons.today,
-                  title: 'Thirukural of the Day',
-                  navigateTo: (){
-                    selectedTile.value= 'Thirukural of the Day';
-                    GET.Get.to(()=> GetThirukuralOfDayScreen(date: '22-06-2025'));
-                  },
+                leadingIcon: Icons.today,
+                title: 'Thirukural of the Day',
+                navigateTo: () {
+                  selectedTile.value = 'Thirukural of the Day';
+                  navigateTo(GetThirukuralOfDayScreen(
+                    date: DateFormat('dd-MM-yyyy').format(DateTime.now()),
+                  ));
+                },
                 height: height * 0.045,
               ),
               spaceDivider(),
               customListTile(
-                  leadingIcon: Icons.search,
-                  title: 'Search Thirukural by Number',
-                  navigateTo: (){
-                    selectedTile.value= 'Search Thirukural by Number';
-                    GET.Get.to(()=> GetKuralByNumber(kuralNumber: 153,));
-                  },
+                leadingIcon: Icons.search,
+                title: 'Search Thirukural by Number',
+                navigateTo: () {
+                  selectedTile.value = 'Search Thirukural by Number';
+                  navigateTo(const GetKuralByNumber(kuralNumber: 153));
+                },
                 height: height * 0.045,
               ),
               spaceDivider(),
               customListTile(
-                  leadingIcon: Icons.list,
-                  title: 'All Thirukurals',
-                  navigateTo: (){
-                    selectedTile.value= 'All Thirukurals';
-                    GET.Get.to(()=> AllKuralsScreen());
-                  },
+                leadingIcon: Icons.list,
+                title: 'All Thirukurals',
+                navigateTo: () {
+                  selectedTile.value = 'All Thirukurals';
+                  navigateTo(const AllKuralsScreen());
+                },
                 height: height * 0.045,
               ),
               spaceDivider(),
               customListTile(
-                  leadingIcon: Icons.straighten,
-                  title: 'Thirukurals in range',
-                  navigateTo: (){
-                    selectedTile.value= 'Thirukural in range';
-                    GET.Get.to(()=> AllKuralsScreenInRange(from: 1, to: 10,));
-                  },
+                leadingIcon: Icons.straighten,
+                title: 'Thirukurals in range',
+                navigateTo: () {
+                  selectedTile.value = 'Thirukural in range';
+                  navigateTo(const AllKuralsScreenInRange(from: 1, to: 10));
+                },
                 height: height * 0.045,
               ),
               spaceDivider(),
               customListTile(
-                  leadingIcon: Icons.book,
-                  title: 'Section Names with Thirukurals',
-                  navigateTo: (){
-                    selectedTile.value= 'Thirukural Section Names';
-                    GET.Get.to(()=> SectionNamesScreen());
-                  },
+                leadingIcon: Icons.book,
+                title: 'Section Names with Thirukurals',
+                navigateTo: () {
+                  selectedTile.value = 'Thirukural Section Names';
+                  navigateTo(const SectionNamesScreen());
+                },
                 height: height * 0.045,
               ),
               spaceDivider(),
               customListTile(
-                  leadingIcon: Icons.auto_stories,
-                  title: 'Tamil Chapter Names with Thirukural',
-                  navigateTo: (){
-                    selectedTile.value= 'Get Thirukurals By Tamil Chapter Names';
-                    GET.Get.to(()=> ThirukuralByTamilChapterName());
-                  },
+                leadingIcon: Icons.auto_stories,
+                title: 'Tamil Chapter Names with Thirukural',
+                navigateTo: () {
+                  selectedTile.value = 'Get Thirukurals By Tamil Chapter Names';
+                  navigateTo(const ThirukuralByTamilChapterName());
+                },
                 height: height * 0.045,
               ),
               spaceDivider(),
               customListTile(
-                  leadingIcon: Icons.auto_stories,
-                  title: 'English Chapter Names with Thirukural',
-                  navigateTo: (){
-                    selectedTile.value= 'Get Thirukurals By English Chapter Names';
-                    GET.Get.to(()=> ThirukuralByEnglishChapterName());
-                  },
+                leadingIcon: Icons.auto_stories,
+                title: 'English Chapter Names with Thirukural',
+                navigateTo: () {
+                  selectedTile.value =
+                      'Get Thirukurals By English Chapter Names';
+                  navigateTo(const ThirukuralByEnglishChapterName());
+                },
                 height: height * 0.045,
               ),
               spaceDivider(),

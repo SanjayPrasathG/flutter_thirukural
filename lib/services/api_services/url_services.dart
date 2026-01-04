@@ -1,17 +1,43 @@
-class UrlServices{
-  static String BASE_URL = 'https://spring-thirukural.onrender.com/thirukural';
+/// URL endpoints for the Thirukural API.
+///
+/// This class contains all the API endpoint constants used to fetch
+/// Thirukural data from the backend server.
+class UrlServices {
+  /// Base URL for the Thirukural API server.
+  static const String baseUrl =
+      'https://spring-thirukural.onrender.com/thirukural';
 
-  static String GET_ALL_THIRUKURALS = 'getAllThirukurals';
-  static String GET_ALL_THIRUKURALS_WITH_RANGE = 'getAllThirukuralsWithRange';
-  static String GET_KURAL_OF_THE_DAY = 'getKuralOfDay';
-  static String GET_KURAL_BY_NUMBER = 'getThirukuralByKuralNumber';
+  /// Endpoint to get all Thirukurals.
+  static const String getAllThirukurals = 'getAllThirukurals';
 
-  static String GET_ALL_TAMIL_CHAPTERS_NAMES = 'getAllTamilChaptersName';
-  static String GET_ALL_ENGLISH_CHAPTERS_NAMES = 'getAllEnglishChaptersName';
+  /// Endpoint to get Thirukurals within a specific range.
+  static const String getAllThirukuralsWithRange = 'getAllThirukuralsWithRange';
 
-  static String GET_ALL_KURALS_BY_TAMIL_CHAPTER_NAMES = 'getThirukuralByTamilChapterName';
-  static String GET_ALL_KURALS_BY_ENGLISH_CHAPTER_NAMES = 'getThirukuralByEnglishChapterName';
+  /// Endpoint to get the Kural of the Day.
+  static const String getKuralOfTheDay = 'getKuralOfDay';
 
-  static String GET_ALL_KURALS_BY_TAMIL_SECTION_NAMES = 'getThirukuralByTamilSectionName';
-  static String GET_ALL_KURALS_BY_ENGLISH_SECTION_NAMES = 'getThirukuralByEnglishSectionName';
+  /// Endpoint to get a Thirukural by its number (1-1330).
+  static const String getKuralByNumber = 'getThirukuralByKuralNumber';
+
+  /// Endpoint to get all Tamil chapter names.
+  static const String getAllTamilChaptersNames = 'getAllTamilChaptersName';
+
+  /// Endpoint to get all English chapter names.
+  static const String getAllEnglishChaptersNames = 'getAllEnglishChaptersName';
+
+  /// Endpoint to get Thirukurals by Tamil chapter name.
+  static const String getKuralsByTamilChapterName =
+      'getThirukuralByTamilChapterName';
+
+  /// Endpoint to get Thirukurals by English chapter name.
+  static const String getKuralsByEnglishChapterName =
+      'getThirukuralByEnglishChapterName';
+
+  /// Endpoint to get Thirukurals by Tamil section name.
+  static const String getKuralsByTamilSectionName =
+      'getThirukuralByTamilSectionName';
+
+  /// Endpoint to get Thirukurals by English section name.
+  static const String getKuralsByEnglishSectionName =
+      'getThirukuralByEnglishSectionName';
 }

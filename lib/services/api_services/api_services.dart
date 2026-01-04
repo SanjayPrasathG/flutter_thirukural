@@ -5,7 +5,7 @@ import 'package:flutter_thirukural/services/api_services/url_services.dart';
 
 class ApiServices {
   static Dio dio = Dio(BaseOptions(
-    baseUrl: UrlServices.BASE_URL,
+    baseUrl: UrlServices.baseUrl,
     connectTimeout: Duration(minutes: 2),
     receiveTimeout: Duration(minutes: 2),
     responseType: ResponseType.json,
@@ -32,7 +32,7 @@ class ApiServices {
       logger.i(requestHeaders);
 
       var response = await dio.get(
-        '${UrlServices.BASE_URL}/$endpoint',
+        '${UrlServices.baseUrl}/$endpoint',
         queryParameters: requestParams ?? {},
         options: Options(
           headers: {
@@ -71,7 +71,8 @@ class ApiServices {
       } else if (dioErr.type == DioExceptionType.receiveTimeout) {
         errorMsg = 'Server took too long to respond.';
       } else if (dioErr.type == DioExceptionType.badResponse) {
-        errorMsg = 'Bad Request - ${dioErr.response?.data['message'] ?? 'Server turned 400 error'}';
+        errorMsg =
+            'Bad Request - ${dioErr.response?.data['message'] ?? 'Server turned 400 error'}';
       } else if (dioErr.type == DioExceptionType.cancel) {
         errorMsg = 'Request was cancelled.';
       } else if (dioErr.type == DioExceptionType.connectionError) {

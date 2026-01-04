@@ -4,19 +4,19 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 import '../../helpers/common_helpers.dart';
-import '../../model/kural_model.dart';
 import '../../view_model/kural_view_model.dart';
 import '../widgets/common_colors.dart';
 import '../widgets/common_widgets.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/custom_loader_button.dart';
 
-class ThirukuralByEnglishChapterName extends HookConsumerWidget{
+class ThirukuralByEnglishChapterName extends HookConsumerWidget {
   const ThirukuralByEnglishChapterName({super.key});
+
+  static const int itemsPerPage = 10;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     final kuralState = ref.watch(kuralViewModelProvider);
     final kuralViewModel = ref.read(kuralViewModelProvider.notifier);
 
@@ -24,464 +24,386 @@ class ThirukuralByEnglishChapterName extends HookConsumerWidget{
     var height = getDeviceHeight(context);
     var width = getDeviceWidth(context);
 
-    var selectedEnglishChapterName = useState<String?>(null);
-    var selectedIndexToShowMore = useState(0);
+    var selectedEnglishChapterName = useState<String?>('');
     var doShowChapterNamesOnly = useState(true);
+    var expandedIndex = useState<int>(-1);
+    var currentPage = useState(1);
 
-    Future onPageLoad() async{
+    final isMobile = ResponsiveBreakpoints.of(context).isMobile;
+
+    Future onPageLoad() async {
       selectedEnglishChapterName.value = '';
-      selectedIndexToShowMore.value = 0;
       doShowChapterNamesOnly.value = true;
+      expandedIndex.value = -1;
+      currentPage.value = 1;
 
       isPageLoaded.value = false;
       await kuralViewModel.getEnglishChapterNames();
       isPageLoaded.value = true;
     }
 
-    useEffect((){
+    useEffect(() {
       Future.microtask(() => onPageLoad());
       return null;
     }, []);
 
-    Widget showAllChapterNames(){
-      if(kuralState.isAllEnglishChaptersLoaded != null
-          && kuralState.isAllEnglishChaptersLoaded!
-          && kuralState.englishChapterNamesErrorMessage != null
-          && kuralState.englishChapterNamesErrorMessage!.isEmpty){
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 10.0,
-          children: [
-            customText(
-                text: 'English Chapter Names',
-                textColor: CommonColors.primary,
-                fontSize: 15.0,
-                fontWeight: FontWeight.bold,
-                textAlign: TextAlign.start,
-                textOverFlow: TextOverflow.clip,
-                maxLines: 1
-            ),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: kuralState.englishChapterNamesList?.length,
-              itemBuilder: (context, index){
-                String chapterName = kuralState.englishChapterNamesList?[index] ?? '';
-                  return GestureDetector(
-                    onTap: () async{
-                      doShowChapterNamesOnly.value = false;
-                      selectedEnglishChapterName.value = chapterName;
-                      isPageLoaded.value = false;
-                      await kuralViewModel.getKuralsByEnglishChapterNames(chapterName: selectedEnglishChapterName.value ?? '');
-                      isPageLoaded.value = true;
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-                      margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15.0),
-                        color: CommonColors.lightPrimary
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            flex: 4,
-                            child: customText(
-                                text: '${index+1}.$chapterName',
-                                textColor: CommonColors.red,
-                                fontSize: 14.0,
-                                fontWeight: FontWeight.bold,
-                                textAlign: TextAlign.start,
-                                textOverFlow: TextOverflow.clip,
-                                maxLines: 5
-                            ),
-                          ),
-                          Expanded(
-                            flex: 1,
-                              child: IconButton(
-                                onPressed: () async{
-                                  doShowChapterNamesOnly.value = false;
-                                  selectedEnglishChapterName.value = chapterName;
-                                  isPageLoaded.value = false;
-                                  await kuralViewModel.getKuralsByEnglishChapterNames(chapterName: selectedEnglishChapterName.value ?? '');
-                                  isPageLoaded.value = true;
-                                },
-                                icon: Icon(Icons.arrow_forward_ios_outlined, color: CommonColors.grey, size: 15.0,)
-                              )
-                          )
-                        ],
-                      ),
-                    ),
-                  );
-                }
+    Widget buildChapterCard(String chapterName, int index) {
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withValues(alpha: 0.08),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
           ],
-        );
-      } else{
-        return Center(
-          child: customText(
-              text: 'Error: ${kuralState.englishChapterNamesErrorMessage}',
-              textColor: CommonColors.red,
-              fontSize: 14.0,
-              fontWeight: FontWeight.bold,
-              textAlign: TextAlign.start,
-              textOverFlow: TextOverflow.clip,
-              maxLines: 5
-          ),
-        );
-      }
-    }
-
-    Widget showKuralWithShowMore({
-      required int index,
-      required Kural kural,
-      required double imgHeight,
-      required double imgWidth,
-    }) {
-      final fullText = kural.kural ?? '';
-      final words = fullText.split(' ');
-
-      final firstLineWords = words.length >= 4
-          ? words.sublist(0, 4)
-          : words;
-
-      final secondLineWords = words.length > 4
-          ? words.sublist(4, words.length > 7 ? 7 : words.length)
-          : [];
-
-      final firstLine = firstLineWords.join(' ');
-      final secondLine = secondLineWords.join(' ');
-
-      final displayText = [
-        firstLine,
-        if (secondLine.isNotEmpty) secondLine,
-      ].join('\n');
-
-      final isMobile = ResponsiveBreakpoints.of(context).isMobile;
-
-      Widget kuralContent = Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          SizedBox(height: 20.0,),
-          customText(
-            text: displayText,
-            textColor: CommonColors.blue,
-            fontSize: isMobile ? 13.0 : 15.0,
-            fontWeight: FontWeight.bold,
-            textAlign: TextAlign.start,
-            textOverFlow: TextOverflow.clip,
-            maxLines: 3,
-          ),
-          SizedBox(height: 5.0),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: customText(
-              text: "- திருவள்ளுவர்",
-              textColor: CommonColors.purple,
-              fontSize: 13.0,
-              fontWeight: FontWeight.bold,
-              textAlign: TextAlign.end,
-              textOverFlow: TextOverflow.clip,
-            ),
-          ),
-        ],
-      );
-
-      Widget imageWidget = ClipOval(
-        child: SizedBox(
-          width: imgWidth,
-          height: imgHeight,
-          child: Image.asset(
-            'assets/images/thiruvalluvar_img.png',
-            fit: BoxFit.cover,
-            alignment: Alignment.center,
-            filterQuality: FilterQuality.high,
-          ),
         ),
-      );
-
-      return Container(
-        margin: EdgeInsets.symmetric(horizontal: 6.0, vertical: 4),
-        padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
-        decoration: BoxDecoration(
-          color: CommonColors.lightPrimary,
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  flex: 5,
-                  child: customText(
-                    text: 'Kural Number : ${kural.kuralNumber ?? 'N/A'}',
-                    textColor: CommonColors.purple,
-                    fontSize: 15.0,
-                    fontWeight: FontWeight.bold,
-                    textAlign: TextAlign.start,
-                    textOverFlow: TextOverflow.clip,
-                  ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: IconButton(
-                    onPressed: () {
-                      if (selectedIndexToShowMore.value == index) {
-                        selectedIndexToShowMore.value = -1;
-                      } else {
-                        selectedIndexToShowMore.value = index;
-                      }
-                    },
-                    icon: selectedIndexToShowMore.value == index
-                        ? Icon(Icons.keyboard_arrow_down, color: CommonColors.primary)
-                        : Icon(Icons.keyboard_arrow_right_rounded, color: CommonColors.black),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 10.0),
-            isMobile
-                ? Column(
-              children: [
-                Center(child: imageWidget),
-                SizedBox(height: 10.0),
-                kuralContent,
-              ],
-            )
-                : Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(flex: 1,child: imageWidget),
-                SizedBox(width: 10.0),
-                Expanded(flex: 4,child: kuralContent),
-              ],
-            ),
-            SizedBox(height: 10.0),
-            Visibility(
-              visible: selectedIndexToShowMore.value == index,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(14),
+            onTap: () async {
+              doShowChapterNamesOnly.value = false;
+              selectedEnglishChapterName.value = chapterName;
+              currentPage.value = 1;
+              expandedIndex.value = -1;
+              isPageLoaded.value = false;
+              await kuralViewModel.getKuralsByEnglishChapterNames(
+                  chapterName: chapterName);
+              isPageLoaded.value = true;
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Row(
                 children: [
-                  customText(
-                    text: 'English Explanation: ',
-                    textColor: CommonColors.black,
-                    fontSize: 15.0,
-                    fontWeight: FontWeight.bold,
-                    textAlign: TextAlign.start,
-                    textOverFlow: TextOverflow.clip,
-                  ),
-                  SizedBox(height: 5.0),
-                  customText(
-                    text: kural.englishExplanation ?? '',
-                    textColor: CommonColors.green,
-                    fontSize: 15.0,
-                    fontWeight: FontWeight.bold,
-                    textAlign: TextAlign.start,
-                    textOverFlow: TextOverflow.clip,
-                    maxLines: 5,
-                  ),
-                  SizedBox(height: 10.0),
-                  customText(
-                    text: 'English Explanation: ',
-                    textColor: CommonColors.black,
-                    fontSize: 15.0,
-                    fontWeight: FontWeight.bold,
-                    textAlign: TextAlign.start,
-                    textOverFlow: TextOverflow.clip,
-                  ),
-                  SizedBox(height: 5.0),
-                  customText(
-                    text: kural.englishExplanation ?? '',
-                    textColor: CommonColors.green,
-                    fontSize: 15.0,
-                    fontWeight: FontWeight.bold,
-                    textAlign: TextAlign.start,
-                    textOverFlow: TextOverflow.clip,
-                    maxLines: 5,
-                  ),
-                  SizedBox(height: 10.0),
-                  customText(
-                    text: 'Section Name',
-                    textColor: CommonColors.black,
-                    fontSize: 15.0,
-                    fontWeight: FontWeight.bold,
-                    textAlign: TextAlign.start,
-                    textOverFlow: TextOverflow.clip,
-                  ),
-                  SizedBox(height: 5.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: customText(
-                          text: kural.englishSectionName ?? '',
-                          textColor: CommonColors.gold,
-                          fontSize: 15.0,
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          const Color(0xFF11998e),
+                          const Color(0xFF38ef7d),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${index + 1}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          textAlign: TextAlign.start,
-                          textOverFlow: TextOverflow.clip,
                         ),
                       ),
-                      Expanded(
-                        child: customText(
-                          text: kural.englishSectionName ?? '',
-                          textColor: CommonColors.gold,
-                          fontSize: 15.0,
-                          fontWeight: FontWeight.bold,
-                          textAlign: TextAlign.end,
-                          textOverFlow: TextOverflow.clip,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                  SizedBox(height: 10.0),
-                  customText(
-                    text: 'Chapter Name',
-                    textColor: CommonColors.black,
-                    fontSize: 15.0,
-                    fontWeight: FontWeight.bold,
-                    textAlign: TextAlign.start,
-                    textOverFlow: TextOverflow.clip,
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Text(
+                      chapterName,
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: primaryFontFamily,
+                      ),
+                    ),
                   ),
-                  SizedBox(height: 5.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: customText(
-                          text: kural.englishChapterName ?? '',
-                          textColor: CommonColors.orange,
-                          fontSize: 15.0,
-                          fontWeight: FontWeight.bold,
-                          textAlign: TextAlign.start,
-                          textOverFlow: TextOverflow.clip,
-                        ),
-                      ),
-                      Expanded(
-                        child: customText(
-                          text: kural.englishChapterName ?? '',
-                          textColor: CommonColors.orange,
-                          fontSize: 15.0,
-                          fontWeight: FontWeight.bold,
-                          textAlign: TextAlign.end,
-                          textOverFlow: TextOverflow.clip,
-                        ),
-                      ),
-                    ],
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF11998e).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.arrow_forward_ios,
+                      color: Color(0xFF11998e),
+                      size: 14,
+                    ),
                   ),
                 ],
               ),
             ),
-            SizedBox(height: 10.0),
-          ],
+          ),
         ),
       );
     }
 
+    Widget showAllChapterNames() {
+      if (kuralState.isAllEnglishChaptersLoaded != null &&
+          kuralState.isAllEnglishChaptersLoaded! &&
+          kuralState.englishChapterNamesErrorMessage != null &&
+          kuralState.englishChapterNamesErrorMessage!.isEmpty) {
+        final chapters = kuralState.englishChapterNamesList ?? [];
 
-    Widget showKuralsInSelectedChapter(){
-      if(kuralState.englishChapterNameKuralsList != null &&
-          kuralState.englishChapterNameKuralsList!.isNotEmpty
-          && kuralState.englishChapterNameKuralsErrorMessage != null
-          && kuralState.englishChapterNameKuralsErrorMessage!.isEmpty){
+        // Pagination for chapters
+        final totalItems = chapters.length;
+        final totalPages = (totalItems / 20).ceil(); // 20 chapters per page
+        final startIndex = (currentPage.value - 1) * 20;
+        final endIndex = (startIndex + 20).clamp(0, totalItems);
+        final currentPageChapters = chapters.sublist(startIndex, endIndex);
+
         return Column(
-          spacing: 10.0,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: customText(
-                      text: 'Kurals in ${selectedEnglishChapterName.value}',
-                      textColor: CommonColors.gold,
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.bold,
-                      textAlign: TextAlign.start,
-                      textOverFlow: TextOverflow.clip,
-                      maxLines: 1
-                  ),
+            // Header
+            Container(
+              margin: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xFF11998e).withValues(alpha: 0.1),
+                    const Color(0xFF38ef7d).withValues(alpha: 0.05),
+                  ],
                 ),
-                Expanded(
-                  flex: 1,
-                  child: CustomLoaderButton(
-                      title: 'Clear',
-                      buttonTextSize: 15.0,
-                      buttonTextColor: CommonColors.primary,
-                      buttonColor: CommonColors.lightPrimary,
-                      isIconButton: false,
-                      onTap: () async{
-                        await onPageLoad();
-                      },
-                      loaderColor: CommonColors.primary
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF11998e).withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.auto_stories,
+                      color: Color(0xFF11998e),
+                      size: 24,
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'English Chapters',
+                          style: TextStyle(
+                            color: const Color(0xFF11998e),
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: primaryFontFamily,
+                          ),
+                        ),
+                        Text(
+                          '${chapters.length} Chapters (Adhikarams)',
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 13,
+                            fontFamily: primaryFontFamily,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-            ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: kuralState.englishChapterNameKuralsList?.length,
-                itemBuilder: (context, index){
-                  Kural? kural = kuralState.englishChapterNameKuralsList?[index];
-                  if(kural != null) {
-                    return showKuralWithShowMore(
-                        kural: kural,
-                        imgHeight: height * 0.15,
-                        imgWidth: width * 0.35,
-                        index: index
-                    );
-                  }
-                  return SizedBox();
-                }
+            // Page Info
+            if (totalPages > 1)
+              buildPageInfo(
+                currentPage: currentPage.value,
+                totalPages: totalPages,
+                totalItems: totalItems,
+                itemsPerPage: 20,
+              ),
+            // Chapter List
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                itemCount: currentPageChapters.length,
+                itemBuilder: (context, index) {
+                  final globalIndex = startIndex + index;
+                  return buildChapterCard(
+                    currentPageChapters[index],
+                    globalIndex,
+                  );
+                },
+              ),
             ),
+            // Pagination
+            if (totalPages > 1)
+              buildPaginationControls(
+                currentPage: currentPage.value,
+                totalPages: totalPages,
+                onPageChanged: (page) {
+                  currentPage.value = page;
+                },
+                isMobile: isMobile,
+              ),
+            const SizedBox(height: 8),
           ],
         );
+      } else {
+        return showErrorWidget(
+          errorMessage: kuralState.englishChapterNamesErrorMessage ??
+              'Error loading chapters',
+        );
       }
-      else{
-        return customText(
-            text: kuralState.englishChapterNameKuralsErrorMessage ?? 'Something went wrong.',
-            textColor: CommonColors.red,
-            fontSize: 14.0,
-            fontWeight: FontWeight.bold,
-            textAlign: TextAlign.start,
-            textOverFlow: TextOverflow.clip,
-            maxLines: 5
+    }
+
+    Widget showKuralsInSelectedChapter() {
+      final kuralsList = kuralState.englishChapterNameKuralsList ?? [];
+      final errorMessage =
+          kuralState.englishChapterNameKuralsErrorMessage ?? '';
+
+      if (kuralsList.isNotEmpty && errorMessage.isEmpty) {
+        // Pagination
+        final totalItems = kuralsList.length;
+        final totalPages = (totalItems / itemsPerPage).ceil();
+        final startIndex = (currentPage.value - 1) * itemsPerPage;
+        final endIndex = (startIndex + itemsPerPage).clamp(0, totalItems);
+        final currentPageKurals = kuralsList.sublist(startIndex, endIndex);
+
+        return Column(
+          children: [
+            // Chapter Header
+            Container(
+              margin: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xFF11998e).withValues(alpha: 0.1),
+                    const Color(0xFF38ef7d).withValues(alpha: 0.05),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: const Color(0xFF11998e).withValues(alpha: 0.2),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Chapter',
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 12,
+                            fontFamily: primaryFontFamily,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          selectedEnglishChapterName.value ?? '',
+                          style: TextStyle(
+                            color: const Color(0xFF11998e),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: primaryFontFamily,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  CustomLoaderButton(
+                    title: 'Back',
+                    buttonTextSize: 14.0,
+                    buttonTextColor: Colors.white,
+                    buttonColor: const Color(0xFF11998e),
+                    isIconButton: false,
+                    onTap: () async {
+                      currentPage.value = 1;
+                      await onPageLoad();
+                    },
+                    loaderColor: Colors.white,
+                    width: 80,
+                    height: 40,
+                  ),
+                ],
+              ),
+            ),
+            // Page Info
+            if (totalItems > 0)
+              buildPageInfo(
+                currentPage: currentPage.value,
+                totalPages: totalPages,
+                totalItems: totalItems,
+                itemsPerPage: itemsPerPage,
+              ),
+            // Kural List
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                itemCount: currentPageKurals.length,
+                itemBuilder: (context, index) {
+                  final kural = currentPageKurals[index];
+                  final globalIndex = startIndex + index;
+                  return showKuralWithShowMore(
+                    kural: kural,
+                    imgHeight: height * 0.15,
+                    imgWidth: width * 0.35,
+                    index: globalIndex,
+                    isMobile: isMobile,
+                    isExpanded: expandedIndex.value == globalIndex,
+                    onToggle: () {
+                      if (expandedIndex.value == globalIndex) {
+                        expandedIndex.value = -1;
+                      } else {
+                        expandedIndex.value = globalIndex;
+                      }
+                    },
+                  );
+                },
+              ),
+            ),
+            // Pagination
+            if (totalPages > 1)
+              buildPaginationControls(
+                currentPage: currentPage.value,
+                totalPages: totalPages,
+                onPageChanged: (page) {
+                  currentPage.value = page;
+                  expandedIndex.value = -1;
+                },
+                isMobile: isMobile,
+              ),
+            const SizedBox(height: 8),
+          ],
+        );
+      } else {
+        return showErrorWidget(
+          errorMessage:
+              errorMessage.isNotEmpty ? errorMessage : 'Something went wrong.',
         );
       }
     }
 
     return Scaffold(
       appBar: CustomHomeAppBar(
-        title: 'Thirukurals by English Chapter Name',
+        title: 'English Chapters',
         titleColor: CommonColors.white,
         showLeading: true,
       ),
-      backgroundColor: CommonColors.white,
-      body: isPageLoaded.value ? Center(
-          child: Container(
-              height: height,
-              width: ResponsiveValue<double>(
-                context,
-                defaultValue: width * 0.5,
-                conditionalValues: [
-                  const Condition.smallerThan(
-                      name: TABLET, value: double.infinity),
-                ],
-              ).value,
-              padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 3.0),
-              child: ListView(
-                  children: [
-                    doShowChapterNamesOnly.value ?
-                        showAllChapterNames() : showKuralsInSelectedChapter()
-                  ]
-              )
-          )
-      )  : showLoader(),
+      backgroundColor: const Color(0xFFF8F9FA),
+      body: isPageLoaded.value
+          ? Center(
+              child: SizedBox(
+                height: height,
+                width: ResponsiveValue<double>(
+                  context,
+                  defaultValue: width * 0.6,
+                  conditionalValues: [
+                    const Condition.smallerThan(
+                        name: TABLET, value: double.infinity),
+                  ],
+                ).value,
+                child: doShowChapterNamesOnly.value
+                    ? showAllChapterNames()
+                    : showKuralsInSelectedChapter(),
+              ),
+            )
+          : showLoader(),
     );
   }
 }

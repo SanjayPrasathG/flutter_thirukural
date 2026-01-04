@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_thirukural/view/widgets/common_colors.dart';
 import 'package:flutter_thirukural/view/widgets/common_widgets.dart';
-import 'package:get/get.dart';
 
 class CustomHomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -9,6 +8,7 @@ class CustomHomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool? showLeading;
   final bool? isCenterTitle;
   final List<Widget>? actions;
+  final VoidCallback? onBackPressed;
 
   const CustomHomeAppBar({
     super.key,
@@ -17,6 +17,7 @@ class CustomHomeAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.showLeading,
     this.isCenterTitle,
     this.actions,
+    this.onBackPressed,
   });
 
   @override
@@ -25,20 +26,32 @@ class CustomHomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: CommonColors.primary,
       elevation: 4,
       automaticallyImplyLeading: false,
-      leading: showLeading != null && showLeading! ?
-        IconButton(onPressed: (){
-          Get.back();
-        },
-            icon: Icon(Icons.arrow_back_ios_new, size: 15.0, color: CommonColors.white,)
-        ) : null,
+      leading: showLeading != null && showLeading!
+          ? IconButton(
+              onPressed: () {
+                if (onBackPressed != null) {
+                  onBackPressed!();
+                } else if (Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                }
+              },
+              icon: Icon(
+                Icons.arrow_back_ios_new,
+                size: 15.0,
+                color: CommonColors.white,
+              ),
+            )
+          : null,
       actions: actions,
       title: customText(
-          text: title,
-          textColor: titleColor,
-          fontSize: 15.0,
-          fontWeight: FontWeight.bold,
-          textAlign: isCenterTitle != null && isCenterTitle! ? TextAlign.center : TextAlign.start,
-          textOverFlow: TextOverflow.clip
+        text: title,
+        textColor: titleColor,
+        fontSize: 15.0,
+        fontWeight: FontWeight.bold,
+        textAlign: isCenterTitle != null && isCenterTitle!
+            ? TextAlign.center
+            : TextAlign.start,
+        textOverFlow: TextOverflow.clip,
       ),
     );
   }

@@ -1,6 +1,6 @@
 import '../model/kural_model.dart';
 
-class KuralState{
+class KuralState {
   Kural? kuralOfTheDay;
   String? errorMessageForKuralOfDay = '';
   bool? isKuralOfDayLoaded;
@@ -43,29 +43,25 @@ class KuralState{
 
   KuralState();
 
-  KuralState.kuralOfDay({
-    required this.kuralOfTheDay,
-    required this.errorMessageForKuralOfDay,
-    required this.isKuralOfDayLoaded
-  });
+  KuralState.kuralOfDay(
+      {required this.kuralOfTheDay,
+      required this.errorMessageForKuralOfDay,
+      required this.isKuralOfDayLoaded});
 
-  KuralState.allKurals({
-    required this.allKuralsList,
-    required this.isAllKuralsLoaded,
-    required this.errorMessageForAllKurals
-  });
+  KuralState.allKurals(
+      {required this.allKuralsList,
+      required this.isAllKuralsLoaded,
+      required this.errorMessageForAllKurals});
 
-  KuralState.allKuralsInRange({
-    required this.kuralsInRangeList,
-    required this.isAllKuralsInRangeLoaded,
-    required this.errorMessageForAllKuralsInRange
-  });
+  KuralState.allKuralsInRange(
+      {required this.kuralsInRangeList,
+      required this.isAllKuralsInRangeLoaded,
+      required this.errorMessageForAllKuralsInRange});
 
-  KuralState.kuralByNumber({
-    required this.kuralByNumber,
-    required this.errorMessageForKuralByNum,
-    required this.isKuralByNumLoaded
-  });
+  KuralState.kuralByNumber(
+      {required this.kuralByNumber,
+      required this.errorMessageForKuralByNum,
+      required this.isKuralByNumLoaded});
 
   KuralState.tamilChapterNames({
     required this.tamilChapterNamesList,
@@ -103,52 +99,49 @@ class KuralState{
     required this.englishSectionNameKuralsErrorMessage,
   });
 
-  KuralState kuralOfDayCopyWith({
-    required Kural? kuralOfTheDay,
-    required String? errorMessageForKuralOfDay,
-    required bool isKuralOfDayLoaded
-  }){
-   return KuralState.kuralOfDay(
-       kuralOfTheDay: kuralOfTheDay ?? this.kuralOfTheDay,
-       errorMessageForKuralOfDay: errorMessageForKuralOfDay ?? this.errorMessageForKuralOfDay,
-       isKuralOfDayLoaded: isKuralOfDayLoaded
-   );
+  KuralState kuralOfDayCopyWith(
+      {required Kural? kuralOfTheDay,
+      required String? errorMessageForKuralOfDay,
+      required bool isKuralOfDayLoaded}) {
+    return KuralState.kuralOfDay(
+        kuralOfTheDay: kuralOfTheDay ?? this.kuralOfTheDay,
+        errorMessageForKuralOfDay:
+            errorMessageForKuralOfDay ?? this.errorMessageForKuralOfDay,
+        isKuralOfDayLoaded: isKuralOfDayLoaded);
   }
 
-  KuralState allKuralsCopyWith({
-    required List<Kural>? allKuralsList,
-    required bool? isAllKuralsLoaded,
-    required String? errorMessageForAllKurals
-  }){
+  KuralState allKuralsCopyWith(
+      {required List<Kural>? allKuralsList,
+      required bool? isAllKuralsLoaded,
+      required String? errorMessageForAllKurals}) {
     return KuralState.allKurals(
         allKuralsList: allKuralsList ?? this.allKuralsList,
         isAllKuralsLoaded: isAllKuralsLoaded ?? this.isAllKuralsLoaded,
-        errorMessageForAllKurals: errorMessageForAllKurals ?? this.errorMessageForAllKurals
-    );
+        errorMessageForAllKurals:
+            errorMessageForAllKurals ?? this.errorMessageForAllKurals);
   }
 
-  KuralState allKuralsInRangeCopyWith({
-    required List<Kural>? kuralsInRangeList,
-    required bool? isAllKuralsInRangeLoaded,
-    required String? errorMessageForAllKuralsInRange
-  }){
+  KuralState allKuralsInRangeCopyWith(
+      {required List<Kural>? kuralsInRangeList,
+      required bool? isAllKuralsInRangeLoaded,
+      required String? errorMessageForAllKuralsInRange}) {
     return KuralState.allKuralsInRange(
         kuralsInRangeList: kuralsInRangeList ?? this.kuralsInRangeList,
-        isAllKuralsInRangeLoaded: isAllKuralsInRangeLoaded ?? this.isAllKuralsInRangeLoaded,
-        errorMessageForAllKuralsInRange: errorMessageForAllKuralsInRange ?? this.errorMessageForAllKuralsInRange
-    );
+        isAllKuralsInRangeLoaded:
+            isAllKuralsInRangeLoaded ?? this.isAllKuralsInRangeLoaded,
+        errorMessageForAllKuralsInRange: errorMessageForAllKuralsInRange ??
+            this.errorMessageForAllKuralsInRange);
   }
 
-  KuralState kuralByNumCopyWith({
-    required Kural? kuralByNum,
-    required String? errorMessageForKuralByNum,
-    required bool? isKuralByNumLoaded
-  }){
+  KuralState kuralByNumCopyWith(
+      {required Kural? kuralByNum,
+      required String? errorMessageForKuralByNum,
+      required bool? isKuralByNumLoaded}) {
     return KuralState.kuralByNumber(
         kuralByNumber: kuralByNum ?? kuralByNumber,
-        errorMessageForKuralByNum: errorMessageForKuralByNum ?? this.errorMessageForKuralByNum,
-        isKuralByNumLoaded: isKuralByNumLoaded ?? this.isKuralByNumLoaded
-    );
+        errorMessageForKuralByNum:
+            errorMessageForKuralByNum ?? this.errorMessageForKuralByNum,
+        isKuralByNumLoaded: isKuralByNumLoaded ?? this.isKuralByNumLoaded);
   }
 
   KuralState copyWithTamilChapterNames({
@@ -157,9 +150,12 @@ class KuralState{
     required String? tamilChapterNamesErrorMessage,
   }) {
     return KuralState.tamilChapterNames(
-      tamilChapterNamesList: tamilChapterNamesList ?? this.tamilChapterNamesList,
-      isAllTamilChaptersLoaded: isAllTamilChaptersLoaded ?? this.isAllTamilChaptersLoaded,
-      tamilChapterNamesErrorMessage: tamilChapterNamesErrorMessage ?? this.tamilChapterNamesErrorMessage,
+      tamilChapterNamesList:
+          tamilChapterNamesList ?? this.tamilChapterNamesList,
+      isAllTamilChaptersLoaded:
+          isAllTamilChaptersLoaded ?? this.isAllTamilChaptersLoaded,
+      tamilChapterNamesErrorMessage:
+          tamilChapterNamesErrorMessage ?? this.tamilChapterNamesErrorMessage,
     );
   }
 
@@ -195,7 +191,8 @@ class KuralState{
     return KuralState.englishChapterNameKurals(
       englishChapterNameKuralsList: englishChapterNameKuralsList,
       isAllEnglishChaptersKuralsLoaded: isAllEnglishChaptersKuralsLoaded,
-      englishChapterNameKuralsErrorMessage: englishChapterNameKuralsErrorMessage,
+      englishChapterNameKuralsErrorMessage:
+          englishChapterNameKuralsErrorMessage,
     );
   }
 
@@ -219,7 +216,8 @@ class KuralState{
     return KuralState.englishSectionKurals(
       englishSectionNameKuralsList: englishSectionNameKuralsList,
       isAllEnglishSectionKuralsLoaded: isAllEnglishSectionKuralsLoaded,
-      englishSectionNameKuralsErrorMessage: englishSectionNameKuralsErrorMessage,
+      englishSectionNameKuralsErrorMessage:
+          englishSectionNameKuralsErrorMessage,
     );
   }
 }

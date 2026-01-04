@@ -12,7 +12,7 @@ class ApiResponse {
   factory ApiResponse.fromJson(Map<String, dynamic> json) {
     return ApiResponse(
       status: json['status'] as bool?,
-      message: json['message'] as String?, 
+      message: json['message'] as String?,
       response: json['response'],
     );
   }

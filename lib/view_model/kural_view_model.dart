@@ -7,9 +7,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../model/kural_model.dart';
 
-final kuralViewModelProvider = StateNotifierProvider<KuralViewModel, KuralState>((ref)=> KuralViewModel(KuralState()));
+final kuralViewModelProvider =
+    StateNotifierProvider<KuralViewModel, KuralState>(
+        (ref) => KuralViewModel(KuralState()));
 
-class KuralViewModel extends StateNotifier<KuralState>{
+class KuralViewModel extends StateNotifier<KuralState> {
   KuralViewModel(super.state);
 
   Kural? kuralOfDay;
@@ -52,37 +54,41 @@ class KuralViewModel extends StateNotifier<KuralState>{
   bool isAllEnglishSectionKuralsLoaded = false;
   String englishSectionNameKuralsErrorMessage = '';
 
-  List<String> tamilSectionNamesList = ['அறத்துப்பால்', 'பொருட்பால்', 'காமத்துப்பால்'];
-  List<String> englishSectionNamesList = ['Arathupaal', 'Porutpaal', 'Kaamathupaal'];
+  List<String> tamilSectionNamesList = [
+    'அறத்துப்பால்',
+    'பொருட்பால்',
+    'காமத்துப்பால்'
+  ];
+  List<String> englishSectionNamesList = [
+    'Arathupaal',
+    'Porutpaal',
+    'Kaamathupaal'
+  ];
 
-
-  Future getKuralOfTheDay({required String? date}) async{
-
+  Future getKuralOfTheDay({required String? date}) async {
     isKuralOfDayLoaded = false;
     kuralOfDay = null;
     errorMessageForKuralOfDay = '';
 
     String validDateMessage = isDateValid(date: date);
     logger.i(validDateMessage);
-    if(validDateMessage.isEmpty) {
+    if (validDateMessage.isEmpty) {
       try {
         ApiResponse response = await ApiServices.get(
             requestHeaders: {},
-            requestParams: {
-              'date': date
-            },
-            endpoint: UrlServices.GET_KURAL_OF_THE_DAY
-        );
+            requestParams: {'date': date},
+            endpoint: UrlServices.getKuralOfTheDay);
 
         logger.w(response.toJson());
 
         if (response.status != null && response.status!) {
           Map<String, dynamic> responseJson = response.response;
-          if(responseJson.isNotEmpty) {
+          if (responseJson.isNotEmpty) {
             kuralOfDay = Kural.fromJson(response.response);
             isKuralOfDayLoaded = true;
-          } else{
-            errorMessageForKuralOfDay = response.message ?? 'No response from server.';
+          } else {
+            errorMessageForKuralOfDay =
+                response.message ?? 'No response from server.';
           }
         } else {
           errorMessageForKuralOfDay = response.message ??
@@ -91,7 +97,7 @@ class KuralViewModel extends StateNotifier<KuralState>{
       } catch (e, stackTrace) {
         logger.e('Error while fetching kural of the day: $e, $stackTrace');
       }
-    }else{
+    } else {
       errorMessageForKuralOfDay = validDateMessage;
     }
 
@@ -101,33 +107,31 @@ class KuralViewModel extends StateNotifier<KuralState>{
     state = state.kuralOfDayCopyWith(
         kuralOfTheDay: kuralOfDay,
         errorMessageForKuralOfDay: errorMessageForKuralOfDay,
-        isKuralOfDayLoaded: isKuralOfDayLoaded
-    );
+        isKuralOfDayLoaded: isKuralOfDayLoaded);
   }
 
-  Future getKuralByKuralNumber({required int? kuralNumber}) async{
+  Future getKuralByKuralNumber({required int? kuralNumber}) async {
     kuralByNumber = null;
     errorMessageForKuralByNum = '';
     isKuralByNumLoaded = false;
 
-    if(kuralNumber != null && kuralNumber != 0) {
+    if (kuralNumber != null && kuralNumber != 0) {
       try {
         ApiResponse response = await ApiServices.get(
             requestHeaders: {},
-            requestParams: {
-              'kuralNumber': kuralNumber
-            },
-            endpoint: UrlServices.GET_KURAL_BY_NUMBER
-        );
+            requestParams: {'kuralNumber': kuralNumber},
+            endpoint: UrlServices.getKuralByNumber);
 
         logger.w(response.toJson());
 
         if (response.status != null && response.status!) {
           Map<String, dynamic> responseJson = response.response;
-          if(responseJson.isNotEmpty) {
+          if (responseJson.isNotEmpty) {
             kuralByNumber = Kural.fromJson(response.response);
-          } else{
-            errorMessageForKuralByNum = response.message ?? 'No response from server.';
+            isKuralByNumLoaded = true;
+          } else {
+            errorMessageForKuralByNum =
+                response.message ?? 'No response from server.';
           }
         } else {
           errorMessageForKuralByNum = response.message ??
@@ -136,21 +140,21 @@ class KuralViewModel extends StateNotifier<KuralState>{
       } catch (e, stackTrace) {
         logger.e('Error while fetching kural by number: $e, $stackTrace');
       }
-    }else{
+    } else {
       errorMessageForKuralByNum = 'Invalid kural number.';
     }
 
-    logger.e('Error message while fetching kural by number: $errorMessageForKuralByNum');
+    logger.e(
+        'Error message while fetching kural by number: $errorMessageForKuralByNum');
     logger.e(errorMessageForKuralByNum);
 
     state = state.kuralByNumCopyWith(
         kuralByNum: kuralByNumber,
         errorMessageForKuralByNum: errorMessageForKuralByNum,
-        isKuralByNumLoaded: isKuralByNumLoaded
-    );
+        isKuralByNumLoaded: isKuralByNumLoaded);
   }
 
-  Future getAllKurals() async{
+  Future getAllKurals() async {
     isAllKuralsLoaded = false;
     allKuralsList.clear();
     errorMessageForAllKurals = '';
@@ -159,20 +163,20 @@ class KuralViewModel extends StateNotifier<KuralState>{
       ApiResponse response = await ApiServices.get(
           requestHeaders: {},
           requestParams: {},
-          endpoint: UrlServices.GET_ALL_THIRUKURALS
-      );
+          endpoint: UrlServices.getAllThirukurals);
 
       logger.w(response.toJson());
 
       if (response.status != null && response.status!) {
         List<dynamic> responseList = response.response ?? [];
-        if(responseList.isNotEmpty) {
-          for(var json in responseList){
+        if (responseList.isNotEmpty) {
+          for (var json in responseList) {
             allKuralsList.add(Kural.fromJson(json));
             isAllKuralsLoaded = true;
           }
-        } else{
-          errorMessageForAllKurals = response.message ?? 'No response from server.';
+        } else {
+          errorMessageForAllKurals =
+              response.message ?? 'No response from server.';
         }
       } else {
         errorMessageForAllKurals = response.message ??
@@ -186,54 +190,49 @@ class KuralViewModel extends StateNotifier<KuralState>{
     state = state.allKuralsCopyWith(
         isAllKuralsLoaded: isAllKuralsLoaded,
         allKuralsList: allKuralsList,
-        errorMessageForAllKurals: errorMessageForAllKurals
-    );
+        errorMessageForAllKurals: errorMessageForAllKurals);
   }
 
-  Future getAllKuralsInRange({required int from, required int to}) async{
-      isAllKuralsInRangeLoaded = false;
-      kuralsInRangeList.clear();
-      errorMessageForAllKuralsInRange = '';
+  Future getAllKuralsInRange({required int from, required int to}) async {
+    isAllKuralsInRangeLoaded = false;
+    kuralsInRangeList.clear();
+    errorMessageForAllKuralsInRange = '';
 
-      try {
-        ApiResponse response = await ApiServices.get(
-            requestHeaders: {},
-            requestParams: {
-              'from': from,
-              'to': to
-            },
-            endpoint: UrlServices.GET_ALL_THIRUKURALS_WITH_RANGE
-        );
+    try {
+      ApiResponse response = await ApiServices.get(
+          requestHeaders: {},
+          requestParams: {'from': from, 'to': to},
+          endpoint: UrlServices.getAllThirukuralsWithRange);
 
-        logger.w(response.toJson());
+      logger.w(response.toJson());
 
-        if (response.status != null && response.status!) {
-          List<dynamic> responseList = response.response ?? [];
-          if(responseList.isNotEmpty) {
-            for(var json in responseList){
-              kuralsInRangeList.add(Kural.fromJson(json));
-              isAllKuralsInRangeLoaded = true;
-            }
-          } else{
-            errorMessageForAllKuralsInRange = response.message ?? 'No response from server.';
+      if (response.status != null && response.status!) {
+        List<dynamic> responseList = response.response ?? [];
+        if (responseList.isNotEmpty) {
+          for (var json in responseList) {
+            kuralsInRangeList.add(Kural.fromJson(json));
+            isAllKuralsInRangeLoaded = true;
           }
         } else {
-          errorMessageForAllKuralsInRange = response.message ??
-              'Server error, failed to load kurals, please try again later';
+          errorMessageForAllKuralsInRange =
+              response.message ?? 'No response from server.';
         }
-      } catch (e, stackTrace) {
-        logger.e('Error while fetching all kurals: $e, $stackTrace');
-        errorMessageForAllKuralsInRange = 'Error while fetching all kurals: $e';
+      } else {
+        errorMessageForAllKuralsInRange = response.message ??
+            'Server error, failed to load kurals, please try again later';
       }
+    } catch (e, stackTrace) {
+      logger.e('Error while fetching all kurals: $e, $stackTrace');
+      errorMessageForAllKuralsInRange = 'Error while fetching all kurals: $e';
+    }
 
     state = state.allKuralsInRangeCopyWith(
-      isAllKuralsInRangeLoaded: isAllKuralsInRangeLoaded,
-      kuralsInRangeList: kuralsInRangeList,
-      errorMessageForAllKuralsInRange: errorMessageForAllKuralsInRange
-    );
+        isAllKuralsInRangeLoaded: isAllKuralsInRangeLoaded,
+        kuralsInRangeList: kuralsInRangeList,
+        errorMessageForAllKuralsInRange: errorMessageForAllKuralsInRange);
   }
 
-  Future getTamilChapterNames() async{
+  Future getTamilChapterNames() async {
     isAllTamilChaptersLoaded = false;
     tamilChapterNamesList.clear();
     tamilChapterNamesErrorMessage = '';
@@ -242,20 +241,20 @@ class KuralViewModel extends StateNotifier<KuralState>{
       ApiResponse response = await ApiServices.get(
           requestHeaders: {},
           requestParams: {},
-          endpoint: UrlServices.GET_ALL_TAMIL_CHAPTERS_NAMES
-      );
+          endpoint: UrlServices.getAllTamilChaptersNames);
 
       logger.w(response.toJson());
 
       if (response.status != null && response.status!) {
         List<dynamic> responseList = response.response ?? [];
-        if(responseList.isNotEmpty) {
-          for(var tamilChapterName in responseList){
+        if (responseList.isNotEmpty) {
+          for (var tamilChapterName in responseList) {
             tamilChapterNamesList.add(tamilChapterName);
             isAllTamilChaptersLoaded = true;
           }
-        } else{
-          tamilChapterNamesErrorMessage = response.message ?? 'No response from server.';
+        } else {
+          tamilChapterNamesErrorMessage =
+              response.message ?? 'No response from server.';
         }
       } else {
         tamilChapterNamesErrorMessage = response.message ??
@@ -263,14 +262,14 @@ class KuralViewModel extends StateNotifier<KuralState>{
       }
     } catch (e, stackTrace) {
       logger.e('Error while fetching all kurals: $e, $stackTrace');
-      tamilChapterNamesErrorMessage = 'Error while fetching all tamil chapter names: $e';
+      tamilChapterNamesErrorMessage =
+          'Error while fetching all tamil chapter names: $e';
     }
 
     state = state.copyWithTamilChapterNames(
         isAllTamilChaptersLoaded: isAllTamilChaptersLoaded,
         tamilChapterNamesList: tamilChapterNamesList,
-        tamilChapterNamesErrorMessage: tamilChapterNamesErrorMessage
-    );
+        tamilChapterNamesErrorMessage: tamilChapterNamesErrorMessage);
   }
 
   Future getEnglishChapterNames() async {
@@ -282,7 +281,7 @@ class KuralViewModel extends StateNotifier<KuralState>{
       ApiResponse response = await ApiServices.get(
         requestHeaders: {},
         requestParams: {},
-        endpoint: UrlServices.GET_ALL_ENGLISH_CHAPTERS_NAMES,
+        endpoint: UrlServices.getAllEnglishChaptersNames,
       );
 
       logger.w(response.toJson());
@@ -295,15 +294,17 @@ class KuralViewModel extends StateNotifier<KuralState>{
             isAllEnglishChaptersLoaded = true;
           }
         } else {
-          englishChapterNamesErrorMessage = response.message ?? 'No response from server.';
+          englishChapterNamesErrorMessage =
+              response.message ?? 'No response from server.';
         }
       } else {
-        englishChapterNamesErrorMessage =
-            response.message ?? 'Server error, failed to load english chapter names, please try again later.';
+        englishChapterNamesErrorMessage = response.message ??
+            'Server error, failed to load english chapter names, please try again later.';
       }
     } catch (e, stackTrace) {
       logger.e('Error while fetching english chapter names: $e, $stackTrace');
-      englishChapterNamesErrorMessage = 'Error while fetching english chapter names: $e';
+      englishChapterNamesErrorMessage =
+          'Error while fetching english chapter names: $e';
     }
 
     state = state.copyWithEnglishChapterNames(
@@ -322,24 +323,25 @@ class KuralViewModel extends StateNotifier<KuralState>{
       ApiResponse response = await ApiServices.get(
         requestHeaders: {},
         requestParams: {'tamilChapterName': chapterName},
-        endpoint: UrlServices.GET_ALL_KURALS_BY_TAMIL_CHAPTER_NAMES,
+        endpoint: UrlServices.getKuralsByTamilChapterName,
       );
 
       logger.w(response.toJson());
 
       if (response.status != null && response.status!) {
         List<dynamic> responseList = response.response ?? [];
-        tamilChapterNameKuralsList = responseList.map((e) => Kural.fromJson(e)).toList();
+        tamilChapterNameKuralsList =
+            responseList.map((e) => Kural.fromJson(e)).toList();
         isAllTamilChaptersKuralsLoaded = true;
       } else {
-        tamilChapterNameKuralsErrorMessage =
-            response.message ?? 'Server error, failed to load tamil chapter kurals.';
+        tamilChapterNameKuralsErrorMessage = response.message ??
+            'Server error, failed to load tamil chapter kurals.';
       }
     } catch (e, stackTrace) {
       logger.e('Error while fetching tamil chapter kurals: $e, $stackTrace');
-      tamilChapterNameKuralsErrorMessage = 'Error while fetching tamil chapter kurals: $e';
+      tamilChapterNameKuralsErrorMessage =
+          'Error while fetching tamil chapter kurals: $e';
     }
-
 
     state = state.copyWithTamilChapterNameKurals(
       tamilChapterNameKuralsList: tamilChapterNameKuralsList,
@@ -357,14 +359,15 @@ class KuralViewModel extends StateNotifier<KuralState>{
       ApiResponse response = await ApiServices.get(
         requestHeaders: {},
         requestParams: {'englishChapterName': chapterName},
-        endpoint: UrlServices.GET_ALL_KURALS_BY_ENGLISH_CHAPTER_NAMES,
+        endpoint: UrlServices.getKuralsByEnglishChapterName,
       );
 
       logger.w(response.toJson());
 
       if (response.status != null && response.status!) {
         List<dynamic> responseList = response.response ?? [];
-        englishChapterNameKuralsList = responseList.map((e) => Kural.fromJson(e)).toList();
+        englishChapterNameKuralsList =
+            responseList.map((e) => Kural.fromJson(e)).toList();
         isAllEnglishChaptersKuralsLoaded = true;
       } else {
         englishChapterNameKuralsErrorMessage =
@@ -378,7 +381,8 @@ class KuralViewModel extends StateNotifier<KuralState>{
     state = state.copyWithEnglishChapterNameKurals(
       englishChapterNameKuralsList: englishChapterNameKuralsList,
       isAllEnglishChaptersKuralsLoaded: isAllEnglishChaptersKuralsLoaded,
-      englishChapterNameKuralsErrorMessage: englishChapterNameKuralsErrorMessage,
+      englishChapterNameKuralsErrorMessage:
+          englishChapterNameKuralsErrorMessage,
     );
   }
 
@@ -391,14 +395,15 @@ class KuralViewModel extends StateNotifier<KuralState>{
       ApiResponse response = await ApiServices.get(
         requestHeaders: {},
         requestParams: {'tamilSectionName': sectionName},
-        endpoint: UrlServices.GET_ALL_KURALS_BY_TAMIL_SECTION_NAMES,
+        endpoint: UrlServices.getKuralsByTamilSectionName,
       );
 
       logger.w(response.toJson());
 
       if (response.status != null && response.status!) {
         List<dynamic> responseList = response.response ?? [];
-        tamilSectionNameKuralsList = responseList.map((e) => Kural.fromJson(e)).toList();
+        tamilSectionNameKuralsList =
+            responseList.map((e) => Kural.fromJson(e)).toList();
         isAllTamilSectionKuralsLoaded = true;
       } else {
         tamilSectionNameKuralsErrorMessage =
@@ -425,14 +430,15 @@ class KuralViewModel extends StateNotifier<KuralState>{
       ApiResponse response = await ApiServices.get(
         requestHeaders: {},
         requestParams: {'englishSectionName': sectionName},
-        endpoint: UrlServices.GET_ALL_KURALS_BY_ENGLISH_SECTION_NAMES,
+        endpoint: UrlServices.getKuralsByEnglishSectionName,
       );
 
       logger.w(response.toJson());
 
       if (response.status != null && response.status!) {
         List<dynamic> responseList = response.response ?? [];
-        englishSectionNameKuralsList = responseList.map((e) => Kural.fromJson(e)).toList();
+        englishSectionNameKuralsList =
+            responseList.map((e) => Kural.fromJson(e)).toList();
         isAllEnglishSectionKuralsLoaded = true;
       } else {
         englishSectionNameKuralsErrorMessage =
@@ -446,8 +452,8 @@ class KuralViewModel extends StateNotifier<KuralState>{
     state = state.copyWithEnglishSectionKurals(
       englishSectionNameKuralsList: englishSectionNameKuralsList,
       isAllEnglishSectionKuralsLoaded: isAllEnglishSectionKuralsLoaded,
-      englishSectionNameKuralsErrorMessage: englishSectionNameKuralsErrorMessage,
+      englishSectionNameKuralsErrorMessage:
+          englishSectionNameKuralsErrorMessage,
     );
   }
-
 }

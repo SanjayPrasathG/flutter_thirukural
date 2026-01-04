@@ -36,7 +36,8 @@ class CustomDropDown extends HookWidget {
     final localSelected = useState<String?>(selectedItem);
 
     return Container(
-      padding: padding ?? const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+      padding: padding ??
+          const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(borderRadius ?? 15.0),
         color: fillColor ?? Colors.grey.shade100,
@@ -48,11 +49,10 @@ class CustomDropDown extends HookWidget {
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: TextStyle(
-              color: CommonColors.grey,
-              fontWeight: FontWeight.w600,
-              fontSize: 15.0,
-              fontFamily: primaryFontFamily
-            ),
+                color: CommonColors.grey,
+                fontWeight: FontWeight.w600,
+                fontSize: 15.0,
+                fontFamily: primaryFontFamily),
             labelText: title,
             filled: true,
             fillColor: fillColor ?? Colors.grey.shade100,
@@ -72,7 +72,8 @@ class CustomDropDown extends HookWidget {
               borderRadius: BorderRadius.circular(borderRadius ?? 15.0),
               borderSide: BorderSide(color: CommonColors.red),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           ),
           validator: validator,
           style: style ?? TextStyle(color: CommonColors.black, fontSize: 16),
@@ -83,13 +84,12 @@ class CustomDropDown extends HookWidget {
             return DropdownMenuItem<String>(
               value: value,
               child: customText(
-                text: value,
-                fontSize: 14.0,
-                fontWeight: FontWeight.w600,
-                textAlign: TextAlign.start,
-                textColor: CommonColors.black,
-                textOverFlow: TextOverflow.clip
-              ),
+                  text: value,
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.w600,
+                  textAlign: TextAlign.start,
+                  textColor: CommonColors.black,
+                  textOverFlow: TextOverflow.clip),
             );
           }).toList(),
           onChanged: (value) {

@@ -9,14 +9,13 @@ import 'package:responsive_framework/responsive_framework.dart';
 
 import '../../helpers/common_helpers.dart';
 
-class GetThirukuralOfDayScreen extends HookConsumerWidget{
+class GetThirukuralOfDayScreen extends HookConsumerWidget {
   final String? date;
 
   const GetThirukuralOfDayScreen({super.key, required this.date});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     final kuralViewModel = ref.read(kuralViewModelProvider.notifier);
     final kuralState = ref.watch(kuralViewModelProvider);
 
@@ -24,7 +23,9 @@ class GetThirukuralOfDayScreen extends HookConsumerWidget{
     var width = getDeviceWidth(context);
     var isPageLoaded = useState(false);
 
-    Future onPageLoad() async{
+    final isMobile = ResponsiveBreakpoints.of(context).isMobile;
+
+    Future onPageLoad() async {
       isPageLoaded.value = false;
       logger.w('page loading');
       await kuralViewModel.getKuralOfTheDay(date: date);
@@ -32,56 +33,118 @@ class GetThirukuralOfDayScreen extends HookConsumerWidget{
       isPageLoaded.value = true;
     }
 
-    useEffect((){
+    useEffect(() {
       Future.microtask(() {
         onPageLoad();
       });
       return null;
     }, []);
 
-    return isPageLoaded.value ? RefreshIndicator(
-      onRefresh: onPageLoad,
-      color: CommonColors.white,
-      backgroundColor: CommonColors.primary,
-      child: Scaffold(
-        appBar: CustomHomeAppBar(
-            title: 'Kural of the Day',
-            titleColor: CommonColors.white,
-            showLeading: true,
-        ),
-        backgroundColor: CommonColors.white,
-        body: Center(
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
-            height: height,
-            width: ResponsiveValue<double>(
-              context,
-              defaultValue: width * 0.8,
-              conditionalValues: [
-                const Condition.smallerThan(
-                    name: TABLET, value: double.infinity),
-              ],
-            ).value,
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                kuralState.errorMessageForKuralOfDay != null && kuralState.errorMessageForKuralOfDay!.isEmpty ?
-                  kuralState.kuralOfTheDay != null ?
-                    showKural(
-                        kural: kuralState.kuralOfTheDay!,
-                        imgHeight: height * 0.18,
-                        imgWidth: width * 0.45,
-                      isMobile: ResponsiveBreakpoints.of(context).isMobile
-                    ) :
-                    showErrorWidget(errorMessage: kuralState.errorMessageForKuralOfDay ?? 'Something went wrong, please try again later')
-                  :
-                showErrorWidget(errorMessage: kuralState.errorMessageForKuralOfDay ?? 'Something went wrong, please try again later')
-              ],
-            ),
-          ),
-        ),
-      ),
-    ) : showLoader();
-  }
+    // Build the kural content widget
+    Widget buildKuralContent() {
+      // Check if loaded successfully
+      final isLoaded = kuralState.isKuralOfDayLoaded == true;
+      final hasKural = kuralState.kuralOfTheDay != null;
+      final errorMsg = kuralState.errorMessageForKuralOfDay ?? '';
 
+      if (isLoaded && hasKural && errorMsg.isEmpty) {
+        return showKural(
+          kural: kuralState.kuralOfTheDay!,
+          imgHeight: height * 0.18,
+          imgWidth: width * 0.45,
+          isMobile: isMobile,
+        );
+      } else {
+        return showErrorWidget(
+          errorMessage: errorMsg.isNotEmpty
+              ? errorMsg
+              : 'Failed to load kural of the day. Please try again.',
+        );
+      }
+    }
+
+    return isPageLoaded.value
+        ? RefreshIndicator(
+            onRefresh: onPageLoad,
+            color: CommonColors.white,
+            backgroundColor: CommonColors.primary,
+            child: Scaffold(
+              appBar: CustomHomeAppBar(
+                title: 'Kural of the Day',
+                titleColor: CommonColors.white,
+                showLeading: true,
+              ),
+              backgroundColor: const Color(0xFFF8F9FA),
+              body: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0, vertical: 12.0),
+                  height: height,
+                  width: ResponsiveValue<double>(
+                    context,
+                    defaultValue: width * 0.7,
+                    conditionalValues: [
+                      const Condition.smallerThan(
+                          name: TABLET, value: double.infinity),
+                    ],
+                  ).value,
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: [
+                      // Date Badge
+                      Center(
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                CommonColors.primary,
+                                CommonColors.secondaryColor,
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(30),
+                            boxShadow: [
+                              BoxShadow(
+                                color: CommonColors.primary.withValues(alpha: 0.3),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.calendar_today,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                              const SizedBox(width: 10),
+                              Text(
+                                date ?? 'Today',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: primaryFontFamily,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      // Kural Card
+                      buildKuralContent(),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          )
+        : showLoader();
+  }
 }

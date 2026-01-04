@@ -13,6 +13,8 @@ import '../widgets/custom_app_bar.dart';
 class AllKuralsScreen extends HookConsumerWidget {
   const AllKuralsScreen({super.key});
 
+  static const int itemsPerPage = 10;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final kuralViewModel = ref.read(kuralViewModelProvider.notifier);
@@ -22,7 +24,8 @@ class AllKuralsScreen extends HookConsumerWidget {
     var width = useState(getDeviceWidth(context));
 
     var isPageLoaded = useState(false);
-    var selectedIndexToShowMore = useState(0);
+    var currentPage = useState(1);
+    var expandedIndex = useState<int>(-1);
 
     Future onPageLoad() async {
       isPageLoaded.value = false;
@@ -37,315 +40,116 @@ class AllKuralsScreen extends HookConsumerWidget {
         onPageLoad();
       });
       return null;
-    }, [kuralState.allKuralsList]);
+    }, const []);
 
-    Widget showKuralWithShowMore({
-      required int index,
-      required Kural kural,
-      required double imgHeight,
-      required double imgWidth,
-    }) {
-      final fullText = kural.kural ?? '';
-      final words = fullText.split(' ');
+    // Calculate pagination
+    final allKurals = kuralState.allKuralsList ?? [];
+    final totalItems = allKurals.length;
+    final totalPages = (totalItems / itemsPerPage).ceil();
 
-      final firstLineWords = words.length >= 4
-          ? words.sublist(0, 4)
-          : words;
+    // Get current page items
+    final startIndex = (currentPage.value - 1) * itemsPerPage;
+    final endIndex = (startIndex + itemsPerPage).clamp(0, totalItems);
+    final currentPageKurals =
+        totalItems > 0 ? allKurals.sublist(startIndex, endIndex) : <Kural>[];
 
-      final secondLineWords = words.length > 4
-          ? words.sublist(4, words.length > 7 ? 7 : words.length)
-          : [];
-
-      final firstLine = firstLineWords.join(' ');
-      final secondLine = secondLineWords.join(' ');
-
-      final displayText = [
-        firstLine,
-        if (secondLine.isNotEmpty) secondLine,
-      ].join('\n');
-
-      final isMobile = ResponsiveBreakpoints.of(context).isMobile;
-
-      Widget kuralContent = Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          SizedBox(height: 20.0,),
-          customText(
-            text: displayText,
-            textColor: CommonColors.blue,
-            fontSize: isMobile ? 13.0 : 15.0,
-            fontWeight: FontWeight.bold,
-            textAlign: TextAlign.start,
-            textOverFlow: TextOverflow.clip,
-            maxLines: 3,
-          ),
-          SizedBox(height: 5.0),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: customText(
-              text: "- திருவள்ளுவர்",
-              textColor: CommonColors.purple,
-              fontSize: 13.0,
-              fontWeight: FontWeight.bold,
-              textAlign: TextAlign.end,
-              textOverFlow: TextOverflow.clip,
-            ),
-          ),
-        ],
-      );
-
-      Widget imageWidget = ClipOval(
-        child: SizedBox(
-          width: imgWidth,
-          height: imgHeight,
-          child: Image.asset(
-            'assets/images/thiruvalluvar_img.png',
-            fit: BoxFit.cover,
-            alignment: Alignment.center,
-            filterQuality: FilterQuality.high,
-          ),
-        ),
-      );
-
-      return Container(
-        margin: EdgeInsets.symmetric(horizontal: 6.0, vertical: 4),
-        padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
-        decoration: BoxDecoration(
-          color: CommonColors.lightPrimary,
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  flex: 5,
-                  child: customText(
-                    text: 'Kural Number : ${kural.kuralNumber ?? 'N/A'}',
-                    textColor: CommonColors.purple,
-                    fontSize: 15.0,
-                    fontWeight: FontWeight.bold,
-                    textAlign: TextAlign.start,
-                    textOverFlow: TextOverflow.clip,
-                  ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: IconButton(
-                    onPressed: () {
-                      if (selectedIndexToShowMore.value == index) {
-                        selectedIndexToShowMore.value = -1;
-                      } else {
-                        selectedIndexToShowMore.value = index;
-                      }
-                    },
-                    icon: selectedIndexToShowMore.value == index
-                        ? Icon(Icons.keyboard_arrow_down, color: CommonColors.primary)
-                        : Icon(Icons.keyboard_arrow_right_rounded, color: CommonColors.black),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 10.0),
-            isMobile
-                ? Column(
-              children: [
-                Center(child: imageWidget),
-                SizedBox(height: 10.0),
-                kuralContent,
-              ],
-            )
-                : Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(flex: 1,child: imageWidget),
-                SizedBox(width: 10.0),
-                Expanded(flex: 4,child: kuralContent),
-              ],
-            ),
-            SizedBox(height: 10.0),
-            Visibility(
-              visible: selectedIndexToShowMore.value == index,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  customText(
-                    text: 'Tamil Explanation: ',
-                    textColor: CommonColors.black,
-                    fontSize: 15.0,
-                    fontWeight: FontWeight.bold,
-                    textAlign: TextAlign.start,
-                    textOverFlow: TextOverflow.clip,
-                  ),
-                  SizedBox(height: 5.0),
-                  customText(
-                    text: kural.tamilExplanation ?? '',
-                    textColor: CommonColors.green,
-                    fontSize: 15.0,
-                    fontWeight: FontWeight.bold,
-                    textAlign: TextAlign.start,
-                    textOverFlow: TextOverflow.clip,
-                    maxLines: 5,
-                  ),
-                  SizedBox(height: 10.0),
-                  customText(
-                    text: 'English Explanation: ',
-                    textColor: CommonColors.black,
-                    fontSize: 15.0,
-                    fontWeight: FontWeight.bold,
-                    textAlign: TextAlign.start,
-                    textOverFlow: TextOverflow.clip,
-                  ),
-                  SizedBox(height: 5.0),
-                  customText(
-                    text: kural.englishExplanation ?? '',
-                    textColor: CommonColors.green,
-                    fontSize: 15.0,
-                    fontWeight: FontWeight.bold,
-                    textAlign: TextAlign.start,
-                    textOverFlow: TextOverflow.clip,
-                    maxLines: 5,
-                  ),
-                  SizedBox(height: 10.0),
-                  customText(
-                    text: 'Section Name',
-                    textColor: CommonColors.black,
-                    fontSize: 15.0,
-                    fontWeight: FontWeight.bold,
-                    textAlign: TextAlign.start,
-                    textOverFlow: TextOverflow.clip,
-                  ),
-                  SizedBox(height: 5.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: customText(
-                          text: kural.tamilSectionName ?? '',
-                          textColor: CommonColors.gold,
-                          fontSize: 15.0,
-                          fontWeight: FontWeight.bold,
-                          textAlign: TextAlign.start,
-                          textOverFlow: TextOverflow.clip,
-                        ),
-                      ),
-                      Expanded(
-                        child: customText(
-                          text: kural.englishSectionName ?? '',
-                          textColor: CommonColors.gold,
-                          fontSize: 15.0,
-                          fontWeight: FontWeight.bold,
-                          textAlign: TextAlign.end,
-                          textOverFlow: TextOverflow.clip,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 10.0),
-                  customText(
-                    text: 'Chapter Name',
-                    textColor: CommonColors.black,
-                    fontSize: 15.0,
-                    fontWeight: FontWeight.bold,
-                    textAlign: TextAlign.start,
-                    textOverFlow: TextOverflow.clip,
-                  ),
-                  SizedBox(height: 5.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: customText(
-                          text: kural.tamilChapterName ?? '',
-                          textColor: CommonColors.orange,
-                          fontSize: 15.0,
-                          fontWeight: FontWeight.bold,
-                          textAlign: TextAlign.start,
-                          textOverFlow: TextOverflow.clip,
-                        ),
-                      ),
-                      Expanded(
-                        child: customText(
-                          text: kural.englishChapterName ?? '',
-                          textColor: CommonColors.orange,
-                          fontSize: 15.0,
-                          fontWeight: FontWeight.bold,
-                          textAlign: TextAlign.end,
-                          textOverFlow: TextOverflow.clip,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 10.0),
-          ],
-        ),
-      );
-    }
+    final isMobile = ResponsiveBreakpoints.of(context).isMobile;
 
     return isPageLoaded.value
         ? RefreshIndicator(
-      onRefresh: onPageLoad,
-      color: CommonColors.white,
-      backgroundColor: CommonColors.primary,
-      child: Scaffold(
-        appBar: CustomHomeAppBar(
-          title: 'All Thirukurals',
-          titleColor: CommonColors.white,
-          showLeading: true,
-        ),
-        backgroundColor: CommonColors.white,
-        body: Center(
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
-            height: height.value,
-            width: ResponsiveValue<double>(
-                context,
-                defaultValue: width.value * 0.5,
-                conditionalValues: [
-                  const Condition.smallerThan(name: TABLET, value: double.infinity),
-                ]
-            ).value,
-            child: ListView(
-              children: [
-                Visibility(
-                  visible: (kuralState.errorMessageForAllKurals == null || kuralState.errorMessageForAllKurals!.isEmpty)
-                      && (kuralState.allKuralsList != null && kuralState.allKuralsList!.isNotEmpty),
-                  child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: kuralState.allKuralsList?.length,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index){
-                        Kural? kural = kuralState.allKuralsList?[index];
-                        if(kural != null){
-                          return showKuralWithShowMore(
-                              kural: kural,
-                              imgHeight: height.value * 0.15,
-                              imgWidth: width.value * 0.5,
-                              index: index
-                          );
-                        }
-                        return SizedBox();
-                      }
+            onRefresh: () async {
+              currentPage.value = 1;
+              expandedIndex.value = -1;
+              await onPageLoad();
+            },
+            color: CommonColors.white,
+            backgroundColor: CommonColors.primary,
+            child: Scaffold(
+              appBar: CustomHomeAppBar(
+                title: 'All Thirukurals',
+                titleColor: CommonColors.white,
+                showLeading: true,
+              ),
+              backgroundColor: const Color(0xFFF8F9FA),
+              body: Center(
+                child: SizedBox(
+                  height: height.value,
+                  width: ResponsiveValue<double>(
+                    context,
+                    defaultValue: width.value * 0.6,
+                    conditionalValues: [
+                      const Condition.smallerThan(
+                          name: TABLET, value: double.infinity),
+                    ],
+                  ).value,
+                  child: Column(
+                    children: [
+                      // Page Info
+                      if (totalItems > 0)
+                        buildPageInfo(
+                          currentPage: currentPage.value,
+                          totalPages: totalPages,
+                          totalItems: totalItems,
+                          itemsPerPage: itemsPerPage,
+                        ),
+
+                      // Kural List
+                      Expanded(
+                        child: (kuralState.errorMessageForAllKurals == null ||
+                                    kuralState
+                                        .errorMessageForAllKurals!.isEmpty) &&
+                                currentPageKurals.isNotEmpty
+                            ? ListView.builder(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8),
+                                itemCount: currentPageKurals.length,
+                                itemBuilder: (context, index) {
+                                  final kural = currentPageKurals[index];
+                                  final globalIndex = startIndex + index;
+                                  return showKuralWithShowMore(
+                                    kural: kural,
+                                    imgHeight: height.value * 0.15,
+                                    imgWidth: width.value * 0.5,
+                                    index: globalIndex,
+                                    isMobile: isMobile,
+                                    isExpanded:
+                                        expandedIndex.value == globalIndex,
+                                    onToggle: () {
+                                      if (expandedIndex.value == globalIndex) {
+                                        expandedIndex.value = -1;
+                                      } else {
+                                        expandedIndex.value = globalIndex;
+                                      }
+                                    },
+                                  );
+                                },
+                              )
+                            : showErrorWidget(
+                                errorMessage: kuralState
+                                        .errorMessageForAllKurals ??
+                                    'Something went wrong while fetching all kurals.',
+                              ),
+                      ),
+
+                      // Pagination Controls
+                      if (totalPages > 1)
+                        buildPaginationControls(
+                          currentPage: currentPage.value,
+                          totalPages: totalPages,
+                          onPageChanged: (page) {
+                            currentPage.value = page;
+                            expandedIndex.value = -1;
+                          },
+                          isMobile: isMobile,
+                        ),
+
+                      const SizedBox(height: 8),
+                    ],
                   ),
                 ),
-                Visibility(
-                    visible: (kuralState.errorMessageForAllKurals != null && kuralState.errorMessageForAllKurals!.isNotEmpty)
-                        || kuralState.allKuralsList == null || kuralState.allKuralsList!.isEmpty,
-                    child: showErrorWidget(errorMessage: kuralState.errorMessageForAllKurals ?? 'Some thing went wrong while fetching all kurals.')
-                ),
-                SizedBox(height: 10.0,),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
-    )
+          )
         : showLoader();
   }
 }
